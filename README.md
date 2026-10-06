@@ -11,6 +11,7 @@ A small Flutter mobile app for browsing projects, viewing project tasks, and upd
 3. [Environment & Versions](#environment--versions)
 4. [Packages](#packages)
 5. [Configuration](#configuration)
+6. [API Layer](#api-layer)
 
 ---
 
@@ -102,3 +103,23 @@ cp lib/core/config.local.example.dart lib/core/config.local.dart
 ```
 
 ---
+## 6 - API Layer
+
+All requests go through `ApiClient` (`lib/core/api_client.dart`), a thin wrapper around `dio`.
+
+- Base URL: `AppConfig.apiBaseUrl`.
+- Every request gets `Content-Type: application/json` and the auth header `Authorization: Bearer <token>` when a token is stored.
+- Every failure becomes an `ApiException` (see below).
+- A 401 response triggers `onUnauthorized`, which sends the user back to login.
+
+Tokens are kept in secure storage. Nothing sensitive is committed.
+
+### Error Handling
+
+Every API failure is an `ApiException` with a `message` and an optional `statusCode`.
+
+- Network/timeout errors have `isNetworkError = true`.
+- `isUnauthorized` (401) → session expired, return to login.
+- `isForbidden` (403) → access denied, session still valid.
+
+Screens show `message` and a retry button when the error is recoverable.
