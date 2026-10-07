@@ -396,7 +396,19 @@ class _ProjectCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                _InitialsAvatar(name: project.name),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.beemBlue.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.folder_rounded,
+                    color: AppColors.beemBlue,
+                    size: 22,
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -414,7 +426,7 @@ class _ProjectCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        _subtitle(project),
+                        project.organizationalUnit?.name ?? "-",
                         style: const TextStyle(
                           fontSize: 11,
                           color: Colors.grey,
@@ -461,53 +473,6 @@ class _ProjectCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _subtitle(Project p) => StatusLabels.label(p.status);
-}
-
-class _InitialsAvatar extends StatelessWidget {
-  const _InitialsAvatar({required this.name});
-
-  final String name;
-
-  @override
-  Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 18,
-      backgroundColor: _colorFrom(name),
-      child: Text(
-        _initialsFrom(name),
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
-
-  String _initialsFrom(String name) {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty || parts.first.isEmpty) return '?';
-    if (parts.length == 1) {
-      return parts.first.substring(0, 1).toUpperCase();
-    }
-    return (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase();
-  }
-
-  /// Deterministic color from the project name — stable across rebuilds.
-  Color _colorFrom(String name) {
-    const palette = [
-      Color(0xFF2599C0),
-      Color(0xFF10B981),
-      Color(0xFF8B5CF6),
-      Color(0xFFF59E0B),
-      Color(0xFFEF4444),
-      Color(0xFF0EA5E9),
-    ];
-    final hash = name.codeUnits.fold<int>(0, (a, b) => a + b);
-    return palette[hash % palette.length];
   }
 }
 
