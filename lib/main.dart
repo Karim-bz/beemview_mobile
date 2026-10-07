@@ -1,13 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'core/api_client.dart';
+import 'core/secure_storage.dart';
+import 'data/repositories/auth_repository.dart';
+import 'features/auth/auth_provider.dart';
+import 'features/auth/session_gate.dart';
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final storage = SecureStorageService();
+  final api = ApiClient(storage: storage);
+  final authRepo = AuthRepository(api: api, storage: storage);
+  final authProvider = AuthProvider(authRepo);
+
+  // When a protected call returns 401, clear the session and go to login.
+  api.onUnauthorized = authProvider.handleUnauthorized;
+
+  // Restore session on startup (runs in the background).
+  authProvider.restoreSession();
+
   runApp(
     MultiProvider(
-      providers: [
-        // Placeholder — remove once real providers are added.
-        Provider<Object>(create: (_) => Object()),
-      ],
+      providers: [ChangeNotifierProvider.value(value: authProvider)],
       child: const BeemViewApp(),
     ),
   );
@@ -22,40 +38,10 @@ class BeemViewApp extends StatelessWidget {
       title: 'BeemView',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff1E96BE)),
-
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true,
       ),
-      home: const _BootstrapScreen(),
-    );
-  }
-}
-
-class _BootstrapScreen extends StatelessWidget {
-  const _BootstrapScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Hello Everyone,',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-              ),
-              SizedBox(height: 20),
-              const Text(
-                'BeemView',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-        ),
-      ),
+      home: const SessionGate(),
     );
   }
 }

@@ -24,7 +24,7 @@ class ApiClient {
       ..sendTimeout = const Duration(milliseconds: AppConfig.sendTimeoutMs)
       ..contentType = Headers.jsonContentType
       ..headers = {'Accept': 'application/json', 'Accept-Language': 'en'}
-      ..validateStatus = (status) => status != null && status < 500;
+      ..validateStatus = (status) => status != null && status >= 200 && status < 300;
 
     _dio.interceptors.add(
       InterceptorsWrapper(
