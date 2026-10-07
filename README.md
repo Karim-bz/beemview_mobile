@@ -76,6 +76,7 @@ Target platforms:
 | `dio` | HTTP client for API requests with interceptors for authentication and error handling. |
 | `flutter_secure_storage` | Securely stores session tokens on the device. |
 | `intl` | For Date formatting. |
+| `connectivity_plus` | Detects when the device has no network interface, so we can show an offline banner and fail requests fast. |
 
 ### Dev dependencies
 
