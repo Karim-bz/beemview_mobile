@@ -1,4 +1,4 @@
-package com.beemview.app.beemview_mobile
+package com.beemview.app
 
 import io.flutter.embedding.android.FlutterActivity
 
