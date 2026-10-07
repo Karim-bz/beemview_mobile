@@ -6,11 +6,7 @@ import '../models/user.dart';
 
 /// Handles login, current user lookup, and session persistence.
 class AuthRepository {
-  AuthRepository({
-    required ApiClient api,
-    required SecureStorageService storage,
-  }) : _api = api,
-       _storage = storage;
+  AuthRepository({required this._api, required this._storage});
 
   final ApiClient _api;
   final SecureStorageService _storage;

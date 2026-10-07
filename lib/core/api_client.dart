@@ -11,13 +11,8 @@ import 'secure_storage.dart';
 /// - Turns any error into [ApiException].
 /// - Notifies [onUnauthorized] when the API returns 401.
 class ApiClient {
-  ApiClient({
-    required SecureStorageService storage,
-    required ConnectivityService connectivity,
-    Dio? dio,
-  }) : _storage = storage,
-       _connectivity = connectivity,
-       _dio = dio ?? Dio() {
+  ApiClient({required this._storage, required this._connectivity, Dio? dio})
+    : _dio = dio ?? Dio() {
     _dio.options
       ..baseUrl = AppConfig.apiBaseUrl
       ..connectTimeout = const Duration(
