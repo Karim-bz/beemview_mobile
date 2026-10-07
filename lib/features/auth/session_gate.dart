@@ -23,6 +23,14 @@ class SessionGate extends StatelessWidget {
         return const LoginScreen();
       case AuthStatus.authenticated:
         return const MainShell();
+      case AuthStatus.sessionCheckFailed:
+        return SessionRetryView(
+          message:
+              context.read<AuthProvider>().error ??
+              'Could not verify your session.',
+          onRetry: () => context.read<AuthProvider>().restoreSession(),
+          onSignOut: () => context.read<AuthProvider>().logout(),
+        );
     }
   }
 }
@@ -57,6 +65,47 @@ class SplashLoading extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SessionRetryView extends StatelessWidget {
+  const SessionRetryView({
+    super.key,
+    required this.message,
+    required this.onRetry,
+    required this.onSignOut,
+  });
+
+  final String message;
+  final VoidCallback onRetry;
+  final VoidCallback onSignOut;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(
+                  Icons.wifi_off_rounded,
+                  size: 44,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 12),
+                Text(message, textAlign: TextAlign.center),
+                const SizedBox(height: 16),
+                FilledButton(onPressed: onRetry, child: const Text('Retry')),
+                TextButton(onPressed: onSignOut, child: const Text('Sign out')),
+              ],
+            ),
           ),
         ),
       ),
