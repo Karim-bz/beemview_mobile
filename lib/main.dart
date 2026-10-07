@@ -6,10 +6,12 @@ import 'core/connectivity_service.dart';
 import 'core/secure_storage.dart';
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/project_repository.dart';
+import 'data/repositories/task_repository.dart';
 import 'features/auth/auth_provider.dart';
 import 'features/auth/session_gate.dart';
 import 'features/connectivity/connectivity_provider.dart';
 import 'features/projects/projects_provider.dart';
+import 'features/tasks/project_tasks_provider.dart';
 import 'shared/widgets/offline_banner.dart';
 
 void main() {
@@ -24,10 +26,12 @@ void main() {
   // Repositories
   final authRepo = AuthRepository(api: api, storage: storage);
   final projectRepo = ProjectRepository(api);
+  final taskRepo = TaskRepository(api);
 
   // Providers
   final authProvider = AuthProvider(authRepo);
   final projectsProvider = ProjectsProvider(projectRepo);
+  final projectTasksProvider = ProjectTasksProvider(taskRepo);
 
   // 401 → clear session and return to login.
   api.onUnauthorized = authProvider.handleUnauthorized;
@@ -41,6 +45,7 @@ void main() {
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider.value(value: projectsProvider),
         ChangeNotifierProvider.value(value: connectivityProvider),
+        ChangeNotifierProvider.value(value: projectTasksProvider),
       ],
       child: const BeemViewApp(),
     ),

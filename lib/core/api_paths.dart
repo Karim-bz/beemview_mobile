@@ -4,4 +4,6 @@ class ApiPaths {
   static const login = '/auth/login';
   static const connectedUser = '/users/me/profile';
   static const projects = '/projects';
+  static const projectTasks = '/tasks/project/';
+  static const tasks = '/tasks/';
 }

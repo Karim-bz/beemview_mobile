@@ -6,6 +6,7 @@ import '../../core/status_labels.dart';
 import '../../data/models/project.dart';
 import '../../shared/widgets/states.dart';
 import '../auth/auth_provider.dart';
+import '../tasks/project_tasks_screen.dart';
 import 'projects_provider.dart';
 
 /// Raw API statuses shown as filter chips, in display order.
@@ -381,8 +382,16 @@ class _ProjectCard extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: () {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Open "${project.name}"')));
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ProjectTasksScreen(
+              projectId: project.id,
+              projectName: project.name,
+            ),
+          ),
+        );
+        // ScaffoldMessenger.of(context)
+        //     .showSnackBar(SnackBar(content: Text('Open "${project.name}"')));
       },
       child: Container(
         padding: const EdgeInsets.all(14),
