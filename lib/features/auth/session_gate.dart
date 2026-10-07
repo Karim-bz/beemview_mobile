@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/assets.dart';
 import '../../core/colors.dart';
 import '../../shared/widgets/beemview_wordmark.dart';
-import '../projects/projects_screen.dart';
+import '../shell/main_shell.dart';
 import 'auth_provider.dart';
 import 'login_screen.dart';
 
@@ -22,7 +22,7 @@ class SessionGate extends StatelessWidget {
       case AuthStatus.unauthenticated:
         return const LoginScreen();
       case AuthStatus.authenticated:
-        return const ProjectsScreen();
+        return const MainShell();
     }
   }
 }

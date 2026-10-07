@@ -1,5 +1,6 @@
 import '../../core/api_client.dart';
 import '../../core/api_exception.dart';
+import '../../core/api_paths.dart';
 import '../../core/secure_storage.dart';
 import '../models/user.dart';
 
@@ -21,7 +22,7 @@ class AuthRepository {
     required String subdomain,
   }) async {
     final res = await _api.post<Map<String, dynamic>>(
-      '/auth/login',
+      ApiPaths.login,
       data: {'email': email, 'password': password, 'subdomain': subdomain},
     );
 
@@ -39,7 +40,7 @@ class AuthRepository {
   /// Fetches the current user using the stored token.
   /// Throws [ApiException] on failure.
   Future<User> me() async {
-    final res = await _api.get<Map<String, dynamic>>('/users/me/profile');
+    final res = await _api.get<Map<String, dynamic>>(ApiPaths.connectedUser);
     final userJson = (res.data?['user'] as Map?)?.cast<String, dynamic>() ?? {};
     return User.fromJson(userJson);
   }
