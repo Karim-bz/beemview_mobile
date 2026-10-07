@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/colors.dart';
+import '../notifications/notifications_screen.dart';
 import '../profile/profile_screen.dart';
 import '../projects/projects_screen.dart';
 
@@ -40,7 +41,7 @@ class _MainShellState extends State<MainShell> {
 
   void _onTap(int index) {
     // Only Projects and Profile are wired. Others are placeholders.
-    if (index == 0 || index == 3) {
+    if (index != 1) {
       setState(() => _index = index);
       return;
     }
@@ -58,7 +59,7 @@ class _MainShellState extends State<MainShell> {
         children: const [
           ProjectsScreen(),
           SizedBox.shrink(), // Tasks placeholder (unused)
-          SizedBox.shrink(), // Notifications placeholder (unused)
+          NotificationsScreen(),
           ProfileScreen(),
         ],
       ),
