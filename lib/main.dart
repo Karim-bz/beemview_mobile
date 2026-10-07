@@ -21,7 +21,8 @@ void main() {
   // Core services
   final storage = SecureStorageService();
   final connectivityService = ConnectivityService();
-  final connectivityProvider = ConnectivityProvider(connectivityService);
+  final connectivityProvider = ConnectivityProvider(connectivityService)
+    ..initialize();
   final api = ApiClient(storage: storage, connectivity: connectivityService);
 
   // Repositories
@@ -67,7 +68,8 @@ class BeemViewApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true,
       ),
-      home: const OfflineBanner(child: SessionGate()),
+      builder: (context, child) => OfflineBanner(child: child!),
+      home: const SessionGate(),
     );
   }
 }

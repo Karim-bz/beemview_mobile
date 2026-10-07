@@ -16,19 +16,26 @@ class OfflineBanner extends StatelessWidget {
 
     return Column(
       children: [
-        AnimatedContainer(
+        AnimatedSize(
           duration: const Duration(milliseconds: 200),
-          height: isOnline ? 0 : 32,
-          color: const Color(0xFFB00020),
           child: isOnline
-              ? null
-              : const Center(
-                  child: Text(
-                    'No internet connection',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+              ? const SizedBox(width: double.infinity)
+              : Material(
+                  color: const Color(0xFFB00020),
+                  child: SafeArea(
+                    bottom: false,
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 6),
+                      child: Center(
+                        child: Text(
+                          'No internet connection',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),

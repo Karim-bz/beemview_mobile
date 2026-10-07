@@ -13,17 +13,26 @@ class ConnectivityProvider extends ChangeNotifier {
 
   bool _online = true;
   bool get isOnline => _online;
+  bool _started = false;
 
   /// Call once at startup. Listens for changes and updates [isOnline].
   Future<void> initialize() async {
-    _online = await _service.isOnline();
+    if (_started) return;
+    _started = true;
+
+    try {
+      _online = await _service.isOnline();
+    } catch (_) {
+      _online = true; // don't show a false offline banner if the check fails
+    }
+    notifyListeners();
+
     _sub = _service.onStatusChange.listen((online) {
       if (online != _online) {
         _online = online;
         notifyListeners();
       }
     });
-    notifyListeners();
   }
 
   @override
