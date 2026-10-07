@@ -4,7 +4,7 @@ import '../../core/api_exception.dart';
 import '../../data/models/user.dart';
 import '../../data/repositories/auth_repository.dart';
 
-enum AuthStatus { unknown, unauthenticated, authenticated }
+enum AuthStatus { unknown, unauthenticated, authenticated, sessionCheckFailed }
 
 /// Holds the auth state and exposes login/logout/restore actions.
 class AuthProvider extends ChangeNotifier {
@@ -23,15 +23,30 @@ class AuthProvider extends ChangeNotifier {
   /// Called once at startup. Restores the session if a token exists and
   /// is still valid; otherwise sends the user to login.
   Future<void> restoreSession() async {
-    try {
-      final user = await _repo.me();
-      _user = user;
-      _status = AuthStatus.authenticated;
-    } on ApiException {
-      // Any failure means we can't trust the stored token.
-      await _repo.logout();
-      _user = null;
+    _status = AuthStatus.unknown;
+    notifyListeners();
+
+    // No saved token: go straight to login (works offline too).
+    if (!await _repo.hasToken()) {
       _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      return;
+    }
+
+    try {
+      _user = await _repo.me();
+      _status = AuthStatus.authenticated;
+    } on ApiException catch (e) {
+      if (e.isUnauthorized) {
+        // Token is really invalid or expired: clear it.
+        await _repo.logout();
+        _user = null;
+        _status = AuthStatus.unauthenticated;
+      } else {
+        // Offline, timeout, 5xx, 429...: keep the token, let the user retry.
+        _error = e.message;
+        _status = AuthStatus.sessionCheckFailed;
+      }
     }
     notifyListeners();
   }

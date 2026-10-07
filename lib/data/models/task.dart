@@ -1,8 +1,6 @@
-/// Field differences handled:
-/// - `dueDate` / `startedDate` (list) vs `due_date` / `start_date` (detail).
-/// - `priority` is capitalized in the list route (`High`) and lowercase in
-///   the detail route (`high`). Stored lowercase everywhere.
-/// - `Assignees` is capitalized in both routes.
+import 'project_ref.dart';
+import 'comment.dart';
+
 class Task {
   const Task({
     required this.id,
@@ -14,24 +12,34 @@ class Task {
     this.dueDate,
     this.projectId,
     this.assignees = const [],
+    this.project,
+    this.comments = const [],
+    this.createdAt,
+    this.updatedAt,
   });
 
   final int id;
   final String name;
   final String? description;
   final String? status;
-
-  /// Always lowercase: low | medium | high | urgent.
-  final String? priority;
-
+  final String? priority; // lowercase
   final DateTime? startDate;
   final DateTime? dueDate;
   final int? projectId;
   final List<Assignee> assignees;
 
+  // Detail-only fields:
+  final ProjectRef? project;
+  final List<Comment> comments;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+
   factory Task.fromJson(Map<String, dynamic> json) {
     final rawAssignees =
         (json['Assignees'] ?? json['assignees']) as List? ?? const [];
+    final rawComments =
+        (json['Comments'] ?? json['comments']) as List? ?? const [];
+    final rawProject = (json['Project'] ?? json['project']) as Map?;
 
     return Task(
       id: (json['id'] as num).toInt(),
@@ -48,15 +56,22 @@ class Task {
           .whereType<Map>()
           .map((e) => Assignee.fromJson(e.cast<String, dynamic>()))
           .toList(),
+      project: rawProject != null
+          ? ProjectRef.fromJson(rawProject.cast<String, dynamic>())
+          : null,
+      comments: rawComments
+          .whereType<Map>()
+          .map((e) => Comment.fromJson(e.cast<String, dynamic>()))
+          .toList(),
+      createdAt: _parseDate(json['created_at']),
+      updatedAt: _parseDate(json['updated_at']),
     );
   }
 
   static String? _normalizePriority(String? raw) => raw?.toLowerCase();
 
   static DateTime? _parseDate(Object? raw) {
-    if (raw is String && raw.isNotEmpty) {
-      return DateTime.tryParse(raw);
-    }
+    if (raw is String && raw.isNotEmpty) return DateTime.tryParse(raw);
     return null;
   }
 }

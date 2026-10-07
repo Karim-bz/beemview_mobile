@@ -7,8 +7,8 @@ import '../../data/models/task.dart';
 import '../../shared/widgets/states.dart';
 import '../../shared/widgets/task_row.dart';
 import 'project_tasks_provider.dart';
+import 'task_details_screen.dart';
 
-/// Statuses shown in the filter chip row (spec §8).
 const _taskStatuses = <String>[
   'to_do',
   'in_progress',
@@ -245,9 +245,11 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
               return TaskRow(
                 task: task,
                 onTap: () {
-                  // Next step: navigate to TaskDetailsScreen.
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Open "${task.name}" (next step)')),
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          TaskDetailsScreen(taskId: task.id, initialTask: task),
+                    ),
                   );
                 },
               );

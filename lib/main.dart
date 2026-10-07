@@ -12,6 +12,7 @@ import 'features/auth/session_gate.dart';
 import 'features/connectivity/connectivity_provider.dart';
 import 'features/projects/projects_provider.dart';
 import 'features/tasks/project_tasks_provider.dart';
+import 'features/tasks/task_details_provider.dart';
 import 'shared/widgets/offline_banner.dart';
 
 void main() {
@@ -20,7 +21,8 @@ void main() {
   // Core services
   final storage = SecureStorageService();
   final connectivityService = ConnectivityService();
-  final connectivityProvider = ConnectivityProvider(connectivityService);
+  final connectivityProvider = ConnectivityProvider(connectivityService)
+    ..initialize();
   final api = ApiClient(storage: storage, connectivity: connectivityService);
 
   // Repositories
@@ -32,6 +34,7 @@ void main() {
   final authProvider = AuthProvider(authRepo);
   final projectsProvider = ProjectsProvider(projectRepo);
   final projectTasksProvider = ProjectTasksProvider(taskRepo);
+  final taskDetailsProvider = TaskDetailsProvider(taskRepo);
 
   // 401 → clear session and return to login.
   api.onUnauthorized = authProvider.handleUnauthorized;
@@ -44,8 +47,9 @@ void main() {
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider.value(value: projectsProvider),
-        ChangeNotifierProvider.value(value: connectivityProvider),
         ChangeNotifierProvider.value(value: projectTasksProvider),
+        ChangeNotifierProvider.value(value: taskDetailsProvider),
+        ChangeNotifierProvider.value(value: connectivityProvider),
       ],
       child: const BeemViewApp(),
     ),
@@ -64,7 +68,8 @@ class BeemViewApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true,
       ),
-      home: const OfflineBanner(child: SessionGate()),
+      builder: (context, child) => OfflineBanner(child: child!),
+      home: const SessionGate(),
     );
   }
 }

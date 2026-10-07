@@ -3,8 +3,6 @@ import 'package:beemview_mobile/core/api_paths.dart';
 import '../../core/api_client.dart';
 import '../models/task.dart';
 
-/// Result of a project-tasks fetch. The list endpoint is unpaginated (spec §2),
-/// so we return everything at once and let the UI filter locally.
 class ProjectTasksResult {
   const ProjectTasksResult({required this.projectName, required this.tasks});
 
@@ -41,5 +39,31 @@ class TaskRepository {
     final res = await _api.get<Map<String, dynamic>>('${ApiPaths.tasks}$id');
     final task = (res.data?['task'] as Map?)?.cast<String, dynamic>() ?? {};
     return Task.fromJson(task);
+  }
+
+  Future<Task> updateStatus({
+    required int taskId,
+    required String status,
+  }) async {
+    final res = await _api.put<Map<String, dynamic>>(
+      '${ApiPaths.tasks}$taskId',
+      data: {'status': status},
+    );
+    final task = (res.data?['task'] as Map?)?.cast<String, dynamic>() ?? {};
+    return Task.fromJson(task);
+  }
+
+  Future<void> addComment({
+    required int taskId,
+    required String content,
+  }) async {
+    await _api.post<Map<String, dynamic>>(
+      ApiPaths.addCommentToTask,
+      data: {
+        'task_id': taskId,
+        'content': content,
+        'mentioned_user_ids': const <int>[],
+      },
+    );
   }
 }

@@ -47,4 +47,9 @@ class AuthRepository {
 
   /// Clears the local token. No server call (spec: no logout route).
   Future<void> logout() => _storage.clearToken();
+
+  Future<bool> hasToken() async {
+    final t = await _storage.readToken();
+    return t != null && t.isNotEmpty;
+  }
 }
