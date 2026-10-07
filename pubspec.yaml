@@ -14,12 +14,19 @@ dependencies:
   intl: ^0.20.3
   provider: ^6.1.5+1
   cupertino_icons: ^1.0.8
+  flutter_launcher_icons: ^0.14.4
+  connectivity_plus: ^7.3.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   mocktail: ^1.0.5
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/beemview_logo.png"
 
 flutter:
   uses-material-design: true
