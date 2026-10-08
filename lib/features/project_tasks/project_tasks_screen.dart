@@ -182,7 +182,24 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
   Widget _searchAndChips(List<Task> all) {
     return Column(
       children: [
-        SearchField(controller: _searchController, hint: 'Search tasks...'),
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.only(left: 2, bottom: 8),
+            child: Text(
+              'Filtering the tasks already loaded for this project',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.muted,
+              ),
+            ),
+          ),
+        ),
+        SearchField(
+          controller: _searchController,
+          hint: 'Filter loaded tasks by name...',
+        ),
         const SizedBox(height: 14),
         _buildFilterChips(all),
       ],

@@ -46,6 +46,10 @@ class TaskDetailsProvider extends ChangeNotifier {
   /// it here so the UI can offer a retry. Cleared on successful retry.
   String? _pendingNote;
 
+  /// True when the pending note failed with a network/timeout error: the
+  /// server may have received it, so the UI warns before a manual retry.
+  bool _pendingNoteMaybeSent = false;
+
   /// Locally-posted comments that the server hasn't yet reflected.
   /// Cleared whenever the task is re-fetched.
   final List<Comment> _localComments = [];
@@ -60,6 +64,7 @@ class TaskDetailsProvider extends ChangeNotifier {
   SubmitOutcome? get lastOutcome => _lastOutcome;
   String? get lastSubmitError => _lastSubmitError;
   String? get pendingNote => _pendingNote;
+  bool get pendingNoteMaybeSent => _pendingNoteMaybeSent;
 
   /// All comments (server + local echo), newest-first.
   List<Comment> get comments {
@@ -91,6 +96,7 @@ class TaskDetailsProvider extends ChangeNotifier {
     _lastOutcome = null;
     _lastSubmitError = null;
     _pendingNote = null;
+    _pendingNoteMaybeSent = false;
     _localComments.clear();
     notifyListeners();
   }
@@ -103,6 +109,7 @@ class TaskDetailsProvider extends ChangeNotifier {
       // screen (task body, comment bar, local comments, retry note...).
       _task = null;
       _pendingNote = null;
+      _pendingNoteMaybeSent = false;
       _lastOutcome = null;
       _lastSubmitError = null;
     }
@@ -150,6 +157,7 @@ class TaskDetailsProvider extends ChangeNotifier {
     _lastOutcome = null;
     _lastSubmitError = null;
     _pendingNote = null;
+    _pendingNoteMaybeSent = false;
     notifyListeners();
 
     // --- Step A: status update ---
@@ -171,7 +179,10 @@ class TaskDetailsProvider extends ChangeNotifier {
         _echoComment(taskId, trimmed, authorName);
       } on ApiException catch (e) {
         // Status saved, comment failed. Preserve the note for retry.
-        if (_taskId == taskId) _pendingNote = trimmed;
+        if (_taskId == taskId) {
+          _pendingNote = trimmed;
+          _pendingNoteMaybeSent = e.isNetworkError;
+        }
         _submitting = false;
         _lastOutcome = SubmitOutcome.partialSuccess;
         _lastSubmitError = e.message;
@@ -242,6 +253,7 @@ class TaskDetailsProvider extends ChangeNotifier {
       await _repo.addComment(taskId: taskId, content: note);
       _echoComment(taskId, note, authorName);
       _pendingNote = null;
+      _pendingNoteMaybeSent = false;
       _submitting = false;
       _lastOutcome = SubmitOutcome.fullSuccess;
       await _refreshQuietly();
@@ -249,11 +261,20 @@ class TaskDetailsProvider extends ChangeNotifier {
       return SubmitOutcome.fullSuccess;
     } on ApiException catch (e) {
       _submitting = false;
+      _pendingNoteMaybeSent = e.isNetworkError;
       _lastOutcome = SubmitOutcome.partialSuccess;
       _lastSubmitError = e.message;
       notifyListeners();
       return SubmitOutcome.partialSuccess;
     }
+  }
+
+  /// Drops the note that failed to post (the user chose not to retry it).
+  void discardPendingNote() {
+    if (_pendingNote == null) return;
+    _pendingNote = null;
+    _pendingNoteMaybeSent = false;
+    notifyListeners();
   }
 
   // ---- Helpers ----

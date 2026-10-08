@@ -10,10 +10,12 @@ import '../../shared/widgets/priority_pill.dart';
 import '../../shared/widgets/states.dart';
 import '../../shared/widgets/status_picker_sheet.dart';
 import '../../shared/widgets/status_pill.dart';
+import '../../shared/widgets/status_update_sheet.dart';
 import '../auth/auth_provider.dart';
 import '../project_tasks/project_tasks_provider.dart';
 import '../projects/projects_provider.dart';
 import 'task_details_provider.dart';
+import 'widgets/pending_note_banner.dart';
 import 'widgets/task_assign_button.dart';
 import 'widgets/task_assignee_chip.dart';
 import 'widgets/task_comment_bar.dart';
@@ -46,9 +48,19 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     if (selected == null || selected == task.status) return;
     if (!mounted) return;
 
+    // Second step: confirm and add the optional note.
+    final request = await showStatusUpdateSheet(
+      context,
+      current: task.status,
+      selected: selected,
+    );
+    if (request == null) return;
+    if (!mounted) return;
+
     final author = context.read<AuthProvider>().user?.fullName;
     final outcome = await context.read<TaskDetailsProvider>().updateStatus(
-      status: selected,
+      status: request.status,
+      note: request.note,
       authorName: author,
     );
 
@@ -85,13 +97,23 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     _handleOutcome(outcome);
   }
 
+  /// Retries only the note that failed after the status was saved.
+  Future<void> _retryPendingNote() async {
+    final author = context.read<AuthProvider>().user?.fullName;
+    final outcome = await context
+        .read<TaskDetailsProvider>()
+        .retryPendingComment(authorName: author);
+    if (!mounted) return;
+    _handleOutcome(outcome, isRetry: true);
+  }
+
   void _comingSoon(String what) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text('$what — coming soon')));
   }
 
-  void _handleOutcome(SubmitOutcome outcome) {
+  void _handleOutcome(SubmitOutcome outcome, {bool isRetry = false}) {
     final messenger = ScaffoldMessenger.of(context);
     switch (outcome) {
       case SubmitOutcome.fullSuccess:
@@ -99,9 +121,13 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         break;
       case SubmitOutcome.partialSuccess:
         messenger.showSnackBar(
-          const SnackBar(
-            content: Text('Status saved, but the note failed to send.'),
-            duration: Duration(seconds: 4),
+          SnackBar(
+            content: Text(
+              isRetry
+                  ? 'The note could not be sent yet.'
+                  : 'Status saved, but the note failed to send.',
+            ),
+            duration: const Duration(seconds: 4),
           ),
         );
         break;
@@ -209,6 +235,16 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
         children: [
+          if (provider.pendingNote != null) ...[
+            PendingNoteBanner(
+              note: provider.pendingNote!,
+              busy: provider.isSubmitting,
+              maybeSent: provider.pendingNoteMaybeSent,
+              onRetry: _retryPendingNote,
+              onDiscard: provider.discardPendingNote,
+            ),
+            const SizedBox(height: 14),
+          ],
           Text(
             task.name,
             style: const TextStyle(
