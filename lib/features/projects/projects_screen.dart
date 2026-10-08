@@ -11,6 +11,7 @@ import '../../shared/widgets/states.dart';
 import '../auth/auth_provider.dart';
 import '../shell/main_shell.dart';
 import '../project_tasks/project_tasks_screen.dart';
+import 'new_project_screen.dart';
 import 'projects_provider.dart';
 
 /// Raw API statuses shown as filter chips, in display order.
@@ -77,6 +78,17 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       ..showSnackBar(SnackBar(content: Text('$what — coming soon')));
   }
 
+  Future<void> _openNewProject() async {
+    final created = await Navigator.of(
+      context,
+    ).push<bool>(MaterialPageRoute(builder: (_) => const NewProjectScreen()));
+    if (created == true && mounted) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('Project created')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ProjectsProvider>();
@@ -85,7 +97,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.canvas,
-      floatingActionButton: _AddButton(onTap: () => _comingSoon('New project')),
+      floatingActionButton: _AddButton(onTap: _openNewProject),
       body: SafeArea(
         bottom: false,
         child: Column(

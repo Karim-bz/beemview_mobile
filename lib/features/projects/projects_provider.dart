@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../core/api_exception.dart';
+import '../../data/models/new_project.dart';
 import '../../data/models/project.dart';
 import '../../data/models/task.dart';
 import '../../data/repositories/project_repository.dart';
@@ -80,6 +81,26 @@ class ProjectsProvider extends ChangeNotifier {
       return ad.compareTo(bd);
     });
     return out;
+  }
+
+  /// Organizational units seen on the loaded projects (unique, by name).
+  /// Used by the "new project" form, since no units endpoint is wired yet.
+  List<OrganizationalUnit> get knownUnits {
+    final byId = <int, OrganizationalUnit>{};
+    for (final p in _projects) {
+      final u = p.organizationalUnit;
+      if (u != null) byId[u.id] = u;
+    }
+    final list = byId.values.toList()
+      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    return list;
+  }
+
+  /// Creates a project, then reloads the list so it shows up.
+  /// Throws [ApiException] so the form can display the message.
+  Future<void> createProject(NewProject project) async {
+    await _repo.createProject(project);
+    await load();
   }
 
   /// Loads the first page (or reloads from scratch).

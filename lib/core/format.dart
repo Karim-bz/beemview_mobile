@@ -52,3 +52,9 @@ String firstName(String full) {
   if (t.isEmpty) return '';
   return t.split(RegExp(r'\s+')).first;
 }
+
+/// "2026-10-06" — the date format the API expects.
+String toApiDate(DateTime d) =>
+    '${d.year.toString().padLeft(4, '0')}-'
+    '${d.month.toString().padLeft(2, '0')}-'
+    '${d.day.toString().padLeft(2, '0')}';
