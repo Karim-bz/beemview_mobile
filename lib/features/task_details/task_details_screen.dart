@@ -11,6 +11,8 @@ import '../../shared/widgets/states.dart';
 import '../../shared/widgets/status_picker_sheet.dart';
 import '../../shared/widgets/status_pill.dart';
 import '../auth/auth_provider.dart';
+import '../project_tasks/project_tasks_provider.dart';
+import '../projects/projects_provider.dart';
 import 'task_details_provider.dart';
 import 'widgets/task_assign_button.dart';
 import 'widgets/task_assignee_chip.dart';
@@ -51,7 +53,21 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
 
     if (!mounted) return;
+    // The status is saved in both of these cases: update the other screens.
+    if (outcome == SubmitOutcome.fullSuccess ||
+        outcome == SubmitOutcome.partialSuccess) {
+      _syncLists(task);
+    }
     _handleOutcome(outcome);
+  }
+
+  /// Keeps the project's task list, the progress bars, the Tasks tab and the
+  /// Profile counters in step with a status change made here.
+  void _syncLists(Task task) {
+    context.read<ProjectsProvider>().refreshSilently();
+    context.read<ProjectTasksProvider>().refreshSilently(
+      projectId: task.projectId ?? task.project?.id,
+    );
   }
 
   Future<void> _openCommentComposer() async {
@@ -343,5 +359,3 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 }
-
-// ---------------- Bottom comment bar ----------------

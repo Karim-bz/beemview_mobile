@@ -29,6 +29,13 @@ class ProjectsProvider extends ChangeNotifier {
   String? _error;
   bool _loadingMore = false;
 
+  /// Bumped by [load] and [clear]. A response that comes back with an old
+  /// token belongs to a request that was replaced, so it is dropped.
+  int _loadToken = 0;
+
+  /// Bumped by [refreshSilently]; newest refresh wins.
+  int _refreshSeq = 0;
+
   ProjectsStatus get status => _status;
   List<Project> get projects => List.unmodifiable(_projects);
   String? get error => _error;
@@ -103,30 +110,72 @@ class ProjectsProvider extends ChangeNotifier {
     await load();
   }
 
+  /// Forgets everything (used when the session ends) and cancels the
+  /// effect of any request still in flight.
+  void clear() {
+    _loadToken++;
+    _refreshSeq++;
+    _status = ProjectsStatus.idle;
+    _projects.clear();
+    _total = 0;
+    _error = null;
+    _loadingMore = false;
+    notifyListeners();
+  }
+
   /// Loads the first page (or reloads from scratch).
   Future<void> load() async {
+    final token = ++_loadToken;
     _status = ProjectsStatus.loading;
     _error = null;
     _projects.clear();
     _total = 0;
+    _loadingMore = false;
     notifyListeners();
 
     try {
       final page = await _repo.fetchProjects(limit: _pageSize, offset: 0);
+      if (token != _loadToken) return;
       _projects.addAll(page.items);
       _total = page.total;
       _status = ProjectsStatus.loaded;
     } on ApiException catch (e) {
+      if (token != _loadToken) return;
       _error = e.message;
       _status = ProjectsStatus.error;
     }
     notifyListeners();
   }
 
+  /// Re-fetches what is already on screen (at least one page) without the
+  /// loading state, so lists and counters update in place after a change
+  /// made elsewhere (task status, new task...). Failures are ignored: the
+  /// current data simply stays.
+  Future<void> refreshSilently() async {
+    if (_status != ProjectsStatus.loaded) return;
+    final token = _loadToken;
+    final seq = ++_refreshSeq;
+    final limit = _projects.length < _pageSize ? _pageSize : _projects.length;
+
+    try {
+      final page = await _repo.fetchProjects(limit: limit, offset: 0);
+      if (token != _loadToken || seq != _refreshSeq) return;
+      _projects
+        ..clear()
+        ..addAll(page.items);
+      _total = page.total;
+      notifyListeners();
+    } on ApiException {
+      // Keep the data we have.
+    }
+  }
+
   /// Fetches the next page and appends.
   Future<void> loadMore() async {
     if (_loadingMore || !hasMore) return;
 
+    final token = _loadToken;
+    final seq = _refreshSeq;
     _loadingMore = true;
     notifyListeners();
 
@@ -135,9 +184,15 @@ class ProjectsProvider extends ChangeNotifier {
         limit: _pageSize,
         offset: _projects.length,
       );
-      _projects.addAll(page.items);
-      _total = page.total;
+      if (token != _loadToken) return; // list was reset meanwhile
+      // If a refresh replaced the list while we waited, this page no longer
+      // lines up with it: drop it (the user can tap "Load more" again).
+      if (seq == _refreshSeq) {
+        _projects.addAll(page.items);
+        _total = page.total;
+      }
     } on ApiException catch (e) {
+      if (token != _loadToken) return;
       // Keep the already-loaded list; just surface the error.
       _error = e.message;
     }

@@ -121,7 +121,7 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
     );
     if (created == true && mounted) {
       // Keep the project cards' task counts in sync.
-      context.read<ProjectsProvider>().load();
+      context.read<ProjectsProvider>().refreshSilently();
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(const SnackBar(content: Text('Task created')));

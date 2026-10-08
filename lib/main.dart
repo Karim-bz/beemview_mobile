@@ -40,6 +40,16 @@ void main() {
   // 401 → clear session and return to login.
   api.onUnauthorized = authProvider.handleUnauthorized;
 
+  // Session ended (sign out or 401): drop every cached screen's data so the
+  // next user never sees the previous one's projects, tasks or comments.
+  authProvider.addListener(() {
+    if (authProvider.status == AuthStatus.unauthenticated) {
+      projectsProvider.clear();
+      projectTasksProvider.clear();
+      taskDetailsProvider.clear();
+    }
+  });
+
   // Restore session on startup.
   authProvider.restoreSession();
 
