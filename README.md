@@ -6,6 +6,12 @@ A small Flutter app to browse projects, view their tasks, and update a task's st
 
 ---
 
+## Download
+
+[⬇ Download the Android APK](https://github.com/Karim-bz/beemview_mobile/raw/main/apk/beemview_mobile.apk)
+
+---
+
 ## What the app does
 
 - **Login** with email, password and tenant subdomain. The session is saved securely and restored when the app restarts.
