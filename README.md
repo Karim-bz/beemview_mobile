@@ -1,126 +1,147 @@
 # BeemView Mobile
 
-A small Flutter mobile app for browsing projects, viewing project tasks, and updating task.
+A small Flutter app to browse projects, view their tasks, and update a task's status.
+
+**Flow:** Login → Projects → Project Tasks → Task Details → Update Status
 
 ---
 
-## Table of Contents
+## What the app does
 
-1. [Overview](#overview)
-2. [Setup & Run](#setup--run)
-3. [Environment & Versions](#environment--versions)
-4. [Packages](#packages)
-5. [Configuration](#configuration)
-6. [API Layer](#api-layer)
-
----
-
-## 1 - Overview
-
-BeemView Mobile is a small standalone Flutter app that lets an authenticated user browse the projects they have access to, view project's tasks, view task details, and update a task's status (with an optional comment).
-
-The app focuses on a single, tight core flow:
-Login > Projects > Project Tasks > Task Details > Update Status
+- **Login** with email, password and tenant subdomain. The session is saved securely and restored when the app restarts.
+- **Projects**: list of your projects with a "Load more" button.
+- **Project tasks**: list of a project's tasks, with a name search and a status filter. Both work on the tasks already loaded.
+- **Task details**: description, project, assignees, dates, status, priority and the latest comment.
+- **Update status**: pick a new status and add an optional note. The note is sent as a separate comment.
 
 ---
 
-## 2 - Setup & Run
+## Quick start
 
-### Prerequisites
-
-- Flutter SDK (see [Environment & Versions](#environment--versions))
-- Dart SDK (bundled with Flutter)
-- An Android emulator/device (primary target) or iOS simulator
-- Network access to access and use API's
-
-### Steps
+**You need:** Flutter 3.47.6 and Dart 3.13.5, plus an Android emulator or phone (iOS is not tested).
 
 ```bash
-# 1. Clone the repository
+# 1. Get the code
 git clone https://github.com/Karim-bz/beemview_mobile
 cd beemview_mobile
 
-# 2. Install dependencies
+# 2. Install packages
 flutter pub get
 
-# 3. Create your local config from the committed template
+# 3. Create your local config
 cp lib/core/config.local.example.dart lib/core/config.local.dart
 
-# 4. Edit lib/core/config.local.dart and fill in the API URL and the supplied subdomain.
-#    (this file is gitignored — do not commit it)
+# 4. Open lib/core/config.local.dart and fill in the API URL and your tenant subdomain
 
-# 5. Run the app
+# 5. Run
 flutter run
 ```
+
+`config.local.dart` is ignored by Git, so your values are never committed.
+
 ---
 
-## 3 - Environment & Versions
+## Project structure
 
-```markdown
-- Flutter:  3.47.6 (stable)
-- Dart: 3.13.5
-
-Target platforms:
-
-- **Android** — primary target, tested on emulator and/or physical device.
-- **iOS** — supported by the code but not verified for this submission.
+```
+lib/
+  core/       API client, config, secure storage, theme, helpers
+  data/
+    models/         typed data classes
+    repositories/   API calls (auth, projects, tasks)
+  features/   one folder per feature: provider + screens
+  shared/     reusable widgets (pills, sheets, loading/empty/error views)
+test/         unit tests
 ```
 
-## 4 - Packages
+The flow of data is always:
 
-### Runtime dependencies
+**Screen → Provider → Repository → API client**
 
-| Package | Purpose |
-|---|---|
-| `provider` | State management. Chosen for its simplicity, testability, and clean fit with per-screen `ChangeNotifier` state. |
-| `dio` | HTTP client for API requests with interceptors for authentication and error handling. |
-| `flutter_secure_storage` | Securely stores session tokens on the device. |
-| `intl` | For Date formatting. |
-| `connectivity_plus` | Detects when the device has no network interface, so we can show an offline banner and fail requests fast. |
-
-### Dev dependencies
-
-| Package | Purpose |
-|---|---|
-| `flutter_lints` | Standard Dart/Flutter lint rules. |
-| `mocktail` | Mocking utilities for unit and widget tests. |
+Screens never call the API directly.
 
 ---
 
-## 5 - Configuration
+## How it works
 
-The API origin and tenant subdomain are preconfigured. Configuration is split across
-two files:
+### State management: Provider
 
-| File | Committed? | Purpose |
-|---|---|---|
-| `lib/core/config.local.example.dart` | ✅ Yes | Template with placeholder values. |
-| `lib/core/config.local.dart` | ❌ No (gitignored) | Real values for your environment. |
+Each feature has a small `ChangeNotifier` provider (auth, projects, project tasks, task details).
+It keeps the state of the screen: loading, empty, error or loaded.
+I chose Provider because the app is small and Provider is simple and easy to test.
 
-### Setup
+### Cleaning up the API data
+
+The API is not consistent between the task list and task details, so the models fix it:
+
+- Dates: `dueDate` / `startedDate` in the list, `due_date` / `start_date` in details.
+- Priority: `High` in the list, `high` in details. The app always uses lowercase.
+- Missing or `null` values are handled safely.
+
+Progress is tracked only through the task status. The app never shows or sends a progress percentage.
+
+### Updating a status
+
+1. Open a task and tap its status.
+2. Pick a new status, add an optional note, and save.
+3. The app sends the status first, then the note as a comment (if there is one).
+4. The task is reloaded to show the new data.
+
+If the status is saved but the note fails, the app keeps the note on screen and offers **Retry note** or **Discard note**.
+Retry only sends the comment, never the status again.
+There is no automatic retry, so a comment is never sent twice by accident.
+While a save is running, the buttons are disabled to stop double submits.
+
+### Errors
+
+- **401**: the session is cleared and you go back to the login screen.
+- **403, 404, 429, 500, timeout, no network**: a clear message is shown, with a retry button when it makes sense.
+- Empty lists show an empty state.
+
+---
+
+## Packages
+
+| Package | Used for |
+|---|---|
+| `provider` | State management |
+| `dio` | API requests |
+| `flutter_secure_storage` | Saving the login token safely |
+| `connectivity_plus` | Offline banner |
+| `intl` | Date formatting |
+| `google_fonts` | App fonts (downloaded on first use) |
+| `mocktail` (dev) | Mocks in tests |
+
+---
+
+## Tests
 
 ```bash
-cp lib/core/config.local.example.dart lib/core/config.local.dart
+flutter test
 ```
 
+| File | What it checks |
+|---|---|
+| `status_and_format_test.dart` | Status labels and due-date helpers |
+| `task_mapping_test.dart` | Task list and details responses are mapped correctly |
+
 ---
-## 6 - API Layer
 
-All requests go through `ApiClient` (`lib/core/api_client.dart`), a thin wrapper around `dio`.
+## Assumptions
 
-- Base URL: `AppConfig.apiBaseUrl`.
-- Every request gets `Content-Type: application/json` and the auth header `Authorization: Bearer <token>` when a token is stored.
-- Every failure becomes an `ApiException` (see below).
-- A 401 response triggers `onUnauthorized`, which sends the user back to login.
+- The tenant subdomain comes from the config file, not from the login screen.
+- Projects load 10 at a time. Project tasks load all at once because that API has no pagination.
+- Return up to 10 recent comments from the API, present a small comments history list.
+- Status values are saved exactly as the API defines them (`to_do`, `in_progress`, `on_hold`, `review`, `changes_requested`, `blocked`, `done`, `canceled`).
 
-Tokens are kept in secure storage. Nothing sensitive is committed.
+---
 
-### Error Handling
+## Known limitations
 
-Every API failure is an `ApiException` with a `message` and an optional `statusCode`.
-
-- Network/timeout errors have `isNetworkError = true`.
-- `isUnauthorized` (401) → session expired, return to login.
-- `isForbidden` (403) → access denied, session still valid.
-
-Screens show `message` and a retry button when the error is recoverable.
+- Tested on Android only.
+- The app also has screens outside the assignment (create project, create task, profile, notifications). The notifications screen is only a placeholder, and some buttons say "coming soon".
+- Validation messages from the server (the `details` list) are not shown, only the main error text.
+- No offline cache. Without a network the app shows a banner and retry buttons.
+- Priority filtering is not implemented (it was optional).
+- Tests cover data mapping and logic, not widgets.
+- Logging out only clears the token on the phone, because the API has no logout route.
