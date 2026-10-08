@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../../core/api_exception.dart';
+import '../../data/models/new_task.dart';
 import '../../data/models/task.dart';
 import '../../data/repositories/task_repository.dart';
 
@@ -21,6 +22,24 @@ class ProjectTasksProvider extends ChangeNotifier {
   String get projectName => _projectName;
   List<Task> get tasks => _allTasks;
   String? get error => _error;
+
+  /// Unique people already assigned to tasks of the loaded project.
+  List<Assignee> get knownAssignees {
+    final byId = <int, Assignee>{};
+    for (final t in _allTasks) {
+      for (final a in t.assignees) {
+        byId.putIfAbsent(a.id, () => a);
+      }
+    }
+    return byId.values.toList();
+  }
+
+  /// Creates a task, then reloads the project's tasks.
+  /// Throws [ApiException] so the form can display the message.
+  Future<void> createTask(NewTask task) async {
+    await _repo.createTask(task);
+    await reload();
+  }
 
   Future<void> load(int projectId) async {
     _projectId = projectId;

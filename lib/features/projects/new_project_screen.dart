@@ -9,6 +9,7 @@ import '../../data/models/new_project.dart';
 import '../../data/models/project.dart';
 import '../../shared/widgets/app_card.dart';
 import '../../shared/widgets/comment_composer_sheet.dart' show GradientButton;
+import '../../shared/widgets/form_parts.dart';
 import '../../shared/widgets/status_picker_sheet.dart' show SheetHandle;
 import 'projects_provider.dart';
 
@@ -131,9 +132,8 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
       helpText: isStart ? 'Start date' : 'End date',
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
-          colorScheme: Theme.of(
-            context,
-          ).colorScheme.copyWith(primary: AppColors.teal),
+          colorScheme: Theme.of(context).colorScheme
+              .copyWith(primary: AppColors.teal),
         ),
         child: child!,
       ),
@@ -245,11 +245,11 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         if (_errorMessage != null) ...[
-                          _ErrorBanner(message: _errorMessage!),
+                          FormErrorBanner(message: _errorMessage!),
                           const SizedBox(height: 16),
                         ],
-                        const _Label('Project name'),
-                        _InputCard(
+                        const FormLabel('Project name'),
+                        InputCard(
                           focused: _nameFocus.hasFocus,
                           child: TextFormField(
                             controller: _nameController,
@@ -269,17 +269,17 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                           ),
                         ),
                         const SizedBox(height: 18),
-                        const _Label('Organizational unit'),
+                        const FormLabel('Organizational unit'),
                         _unitField(units),
                         const SizedBox(height: 18),
-                        const _Label('Status'),
+                        const FormLabel('Status'),
                         _statusChips(),
                         const SizedBox(height: 18),
-                        const _Label('Timeline'),
+                        const FormLabel('Timeline'),
                         Row(
                           children: [
                             Expanded(
-                              child: _DateTile(
+                              child: DateTile(
                                 label: 'Start',
                                 date: _startDate,
                                 onTap: _submitting
@@ -289,7 +289,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                             ),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: _DateTile(
+                              child: DateTile(
                                 label: 'End',
                                 date: _endDate,
                                 error: !_datesValid,
@@ -301,10 +301,10 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                           ],
                         ),
                         if (!_datesValid)
-                          const _FieldError('End date must be after start'),
+                          const FormFieldError('End date must be after start'),
                         const SizedBox(height: 18),
-                        const _Label('Description (optional)'),
-                        _InputCard(
+                        const FormLabel('Description (optional)'),
+                        InputCard(
                           focused: _descriptionFocus.hasFocus,
                           child: TextFormField(
                             controller: _descriptionController,
@@ -371,7 +371,10 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
 
   // -------- Sections --------
 
-  static const _inputStyle = TextStyle(fontSize: 15, fontWeight: FontWeight.w500);
+  static const _inputStyle = TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w500,
+  );
 
   InputDecoration _decoration({
     required String hint,
@@ -410,7 +413,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
   /// otherwise a numeric ID field so the form is never blocked.
   Widget _unitField(List<OrganizationalUnit> units) {
     if (units.isEmpty) {
-      return _InputCard(
+      return InputCard(
         focused: _unitIdFocus.hasFocus,
         child: TextFormField(
           controller: _unitIdController,
@@ -462,7 +465,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
             ],
           ),
         ),
-        if (_unitError) const _FieldError('Select an organizational unit'),
+        if (_unitError) const FormFieldError('Select an organizational unit'),
       ],
     );
   }
@@ -484,112 +487,6 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
 }
 
 // -------- Supporting widgets --------
-
-class _Label extends StatelessWidget {
-  const _Label(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          color: AppColors.muted,
-        ),
-      ),
-    );
-  }
-}
-
-class _FieldError extends StatelessWidget {
-  const _FieldError(this.message);
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 6, top: 6),
-      child: Text(
-        message,
-        style: const TextStyle(
-          color: AppColors.danger,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
-
-/// White rounded card that gets a teal outline while focused
-/// (same look as the login fields).
-class _InputCard extends StatelessWidget {
-  const _InputCard({required this.child, required this.focused});
-
-  final Widget child;
-  final bool focused;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 160),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.m),
-        border: Border.all(
-          color: focused ? AppColors.teal : Colors.transparent,
-          width: 2,
-        ),
-        boxShadow: AppShadows.soft,
-      ),
-      child: child,
-    );
-  }
-}
-
-class _ErrorBanner extends StatelessWidget {
-  const _ErrorBanner({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.dangerTint,
-        borderRadius: BorderRadius.circular(AppRadius.m),
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.error_outline_rounded,
-            color: AppColors.danger,
-            size: 20,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(
-                color: AppColors.danger,
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                height: 1.3,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _StatusChip extends StatelessWidget {
   const _StatusChip({
@@ -633,72 +530,6 @@ class _StatusChip extends StatelessWidget {
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 color: selected ? Colors.white : AppColors.ink,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DateTile extends StatelessWidget {
-  const _DateTile({
-    required this.label,
-    required this.date,
-    required this.onTap,
-    this.error = false,
-  });
-
-  final String label;
-  final DateTime date;
-  final VoidCallback? onTap;
-  final bool error;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.l),
-        border: Border.all(
-          color: error ? AppColors.danger : Colors.transparent,
-          width: 2,
-        ),
-      ),
-      child: AppCard(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        onTap: onTap,
-        child: Row(
-          children: [
-            const Icon(
-              Icons.calendar_today_rounded,
-              size: 18,
-              color: AppColors.teal,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 11.5,
-                      color: AppColors.muted,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    fmtDate(date),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
               ),
             ),
           ],

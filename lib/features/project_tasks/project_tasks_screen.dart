@@ -6,11 +6,12 @@ import '../../core/format.dart';
 import '../../core/status_labels.dart';
 import '../../data/models/project.dart';
 import '../../data/models/task.dart';
-import '../../shared/widgets/app_bottom_nav.dart';
+import '../../shared/widgets/add_fab.dart';
 import '../../shared/widgets/app_card.dart';
 import '../../shared/widgets/states.dart';
 import '../../shared/widgets/task_row.dart';
-import '../shell/main_shell.dart';
+import '../projects/projects_provider.dart';
+import 'new_task_screen.dart';
 import 'project_tasks_provider.dart';
 import '../task_details/task_details_screen.dart';
 import 'widgets/project_overview.dart';
@@ -109,18 +110,30 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
     return dueToday > 0 ? '$base · $dueToday due today' : base;
   }
 
+  Future<void> _openNewTask() async {
+    final created = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => NewTaskScreen(
+          projectId: widget.projectId,
+          projectName: widget.projectName,
+        ),
+      ),
+    );
+    if (created == true && mounted) {
+      // Keep the project cards' task counts in sync.
+      context.read<ProjectsProvider>().load();
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('Task created')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<ProjectTasksProvider>();
     return Scaffold(
       backgroundColor: AppColors.canvas,
-      bottomNavigationBar: AppBottomNav(
-        currentIndex: 1,
-        onTap: (i) {
-          shellIndex.value = i;
-          Navigator.of(context).popUntil((r) => r.isFirst);
-        },
-      ),
+      floatingActionButton: AddFab(onTap: _openNewTask),
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -220,7 +233,7 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
       onRefresh: _refresh,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 96),
         children: children,
       ),
     );
