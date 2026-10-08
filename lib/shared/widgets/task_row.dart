@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../data/models/task.dart';
-import 'initials_avatar.dart';
+import '../../core/colors.dart';
+import '../../core/format.dart';
+import '../../data/models/task.dart';
 import 'priority_pill.dart';
 import 'status_pill.dart';
 
@@ -13,96 +14,114 @@ class TaskRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF9FAFB),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFF3F4F6)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    task.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ),
-                const Icon(Icons.chevron_right, color: Colors.grey, size: 18),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                StatusPill(status: task.status),
-                const SizedBox(width: 8),
-                if (task.priority != null)
-                  PriorityPill(priority: task.priority!),
-              ],
-            ),
-            if (task.assignees.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Row(
+    final barColor = PriorityPill.colorFor(task.priority);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.m),
+        boxShadow: AppShadows.soft,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppRadius.m),
+        child: Material(
+          color: Colors.white,
+          child: InkWell(
+            onTap: onTap,
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  for (final a in task.assignees.take(3))
-                    Padding(
-                      padding: const EdgeInsets.only(right: 4),
-                      child: InitialsAvatar(name: a.fullName, radius: 12),
+                  Container(width: 5, color: barColor),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  task.name,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ),
+                              const Icon(
+                                Icons.chevron_right_rounded,
+                                color: AppColors.hint,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              StatusPill(status: task.status),
+                              const SizedBox(width: 10),
+                              if (task.priority != null)
+                                PriorityPill(priority: task.priority!),
+                              const Spacer(),
+                              if (task.dueDate != null) _DueLabel(task: task),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  if (task.assignees.length > 3)
-                    Text(
-                      '+${task.assignees.length - 3}',
-                      style: const TextStyle(fontSize: 11, color: Colors.grey),
-                    ),
-                ],
-              ),
-            ],
-            if (task.dueDate != null) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  const Icon(Icons.event_rounded, size: 13, color: Colors.grey),
-                  const SizedBox(width: 4),
-                  Text(
-                    'Due ${_formatDate(task.dueDate!)}',
-                    style: const TextStyle(fontSize: 11, color: Colors.grey),
                   ),
                 ],
               ),
-            ],
-          ],
+            ),
+          ),
         ),
       ),
     );
   }
+}
 
-  static String _formatDate(DateTime d) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${months[d.month - 1]} ${d.day}, ${d.year}';
+class _DueLabel extends StatelessWidget {
+  const _DueLabel({required this.task});
+
+  final Task task;
+
+  @override
+  Widget build(BuildContext context) {
+    final days = daysUntil(task.dueDate);
+    final closed = isClosedStatus(task.status);
+    final isToday = days == 0 && !closed;
+    final overdue = days != null && days < 0 && !closed;
+
+    final color = isToday
+        ? AppColors.orange
+        : overdue
+        ? AppColors.danger
+        : AppColors.muted;
+
+    final text = isToday
+        ? 'Today'
+        : closed || days == null
+        ? fmtShort(task.dueDate!)
+        : '${fmtShort(task.dueDate!)} · ${days}d';
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.calendar_today_outlined, size: 12.5, color: color),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
+            color: color,
+          ),
+        ),
+      ],
+    );
   }
 }

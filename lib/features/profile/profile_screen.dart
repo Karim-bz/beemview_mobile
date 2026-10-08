@@ -2,93 +2,330 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/colors.dart';
+import '../../shared/widgets/app_card.dart';
+import '../../shared/widgets/initials_avatar.dart';
 import '../auth/auth_provider.dart';
+import '../projects/projects_provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  void _comingSoon(BuildContext context, String what) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text('$what — coming soon')));
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().user;
+    final stats = context.watch<ProjectsProvider>().statsFor(user?.id);
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'Profile',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w700,
-            fontSize: 20,
-          ),
-        ),
-      ),
+      backgroundColor: AppColors.canvas,
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: AppColors.beemBlue.withValues(alpha: 0.15),
-                  child: Text(
-                    user == null ? '?' : _initials(user.fullName),
-                    style: const TextStyle(
-                      color: AppColors.beemBlue,
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
+        bottom: false,
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+          children: [
+            const Text(
+              'Profile',
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.8,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _HeroCard(
+              name: user?.fullName ?? 'Unknown user',
+              email: user?.email,
+              initials: user == null
+                  ? '?'
+                  : InitialsAvatar.initialsOf(user.fullName),
+              stats: stats,
+            ),
+            const SizedBox(height: 16),
+            AppCard(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              child: Column(
+                children: [
+                  _SettingsRow(
+                    icon: Icons.notifications_none_rounded,
+                    color: AppColors.teal,
+                    label: 'Notifications',
+                    onTap: () => _comingSoon(context, 'Notification settings'),
                   ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  user?.fullName ?? 'Unknown user',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black87,
+                  _SettingsRow(
+                    icon: Icons.dark_mode_outlined,
+                    color: const Color(0xFF7B61FF),
+                    label: 'Appearance',
+                    value: 'Light',
+                    onTap: () => _comingSoon(context, 'Appearance'),
                   ),
-                ),
-                if (user?.email != null) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    user!.email!,
-                    style: const TextStyle(fontSize: 13, color: Colors.grey),
+                  _SettingsRow(
+                    icon: Icons.public_rounded,
+                    color: AppColors.green,
+                    label: 'Language',
+                    value: 'English',
+                    onTap: () => _comingSoon(context, 'Language'),
+                  ),
+                  _SettingsRow(
+                    icon: Icons.info_outline_rounded,
+                    color: AppColors.orange,
+                    label: 'Version',
+                    value: '1.0.0',
+                    onTap: () => {},
+                    notClickable: true,
                   ),
                 ],
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () => context.read<AuthProvider>().logout(),
-                    icon: const Icon(Icons.logout, size: 18),
-                    label: const Text('Sign out'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.red,
-                      side: const BorderSide(color: Colors.red),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 54,
+              child: TextButton.icon(
+                onPressed: () => context.read<AuthProvider>().logout(),
+                icon: const Icon(Icons.logout_rounded, size: 19),
+                label: const Text(
+                  'Sign out',
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                ),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.danger,
+                  backgroundColor: AppColors.dangerTint,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.l),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
+}
 
-  String _initials(String name) {
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty || parts.first.isEmpty) return '?';
-    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
-    return (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase();
+class _HeroCard extends StatelessWidget {
+  const _HeroCard({
+    required this.name,
+    required this.email,
+    required this.initials,
+    required this.stats,
+  });
+
+  final String name;
+  final String? email;
+  final String initials;
+  final TaskStats stats;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadius.xl),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: AppGradients.primary,
+          boxShadow: AppShadows.glow(AppColors.teal),
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -40,
+              top: -50,
+              child: Container(
+                width: 170,
+                height: 170,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.08),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            Positioned(
+              left: -30,
+              bottom: -60,
+              child: Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.06),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 22, 16, 16),
+              child: Column(
+                children: [
+                  Container(
+                    width: 84,
+                    height: 84,
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.25),
+                    ),
+                    child: CircleAvatar(
+                      backgroundColor: Colors.white,
+                      child: Text(
+                        initials,
+                        style: const TextStyle(
+                          color: AppColors.teal,
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 21,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  if (email != null) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      email!,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 18),
+                  Row(
+                    children: [
+                      _StatTile(value: stats.completed, label: 'Completed'),
+                      const SizedBox(width: 10),
+                      _StatTile(value: stats.inProgress, label: 'In progress'),
+                      const SizedBox(width: 10),
+                      _StatTile(value: stats.overdue, label: 'Overdue'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatTile extends StatelessWidget {
+  const _StatTile({required this.value, required this.label});
+
+  final int value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.18),
+          borderRadius: BorderRadius.circular(AppRadius.m),
+        ),
+        child: Column(
+          children: [
+            Text(
+              '$value',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.85),
+                fontSize: 11.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsRow extends StatelessWidget {
+  const _SettingsRow({
+    required this.icon,
+    required this.color,
+    required this.label,
+    required this.onTap,
+    this.value,
+    this.notClickable = false,
+  });
+
+  final IconData icon;
+  final Color color;
+  final String label;
+  final String? value;
+  final bool? notClickable;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppRadius.m),
+      onTap: notClickable! ? null : onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 11),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.13),
+                borderRadius: BorderRadius.circular(13),
+              ),
+              child: Icon(icon, size: 20, color: color),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+            if (value != null)
+              Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: Text(
+                  value!,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.muted,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            if (!notClickable!)
+              const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.hint,
+                size: 20,
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }

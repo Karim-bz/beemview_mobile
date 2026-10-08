@@ -1,6 +1,7 @@
 import 'package:beemview_mobile/core/api_paths.dart';
 
 import '../../core/api_client.dart';
+import '../models/new_task.dart';
 import '../models/task.dart';
 
 class ProjectTasksResult {
@@ -64,6 +65,13 @@ class TaskRepository {
         'content': content,
         'mentioned_user_ids': const <int>[],
       },
+    );
+  }
+
+  Future<void> createTask(NewTask task) async {
+    await _api.post<Map<String, dynamic>>(
+      ApiPaths.createTask,
+      data: task.toJson(),
     );
   }
 }

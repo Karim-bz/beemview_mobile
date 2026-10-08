@@ -1,10 +1,11 @@
-import 'package:beemview_mobile/core/assets.dart';
-import 'package:beemview_mobile/core/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/assets.dart';
+import '../../core/colors.dart';
 import '../../core/config.dart';
 import '../../shared/widgets/beemview_wordmark.dart';
+import '../../shared/widgets/comment_composer_sheet.dart' show GradientButton;
 import 'auth_provider.dart';
 
 enum LoginState { empty, filled, loading, error }
@@ -20,6 +21,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final _emailFocus = FocusNode();
+  final _passwordFocus = FocusNode();
 
   bool _isPasswordObscured = true;
   bool _submitting = false;
@@ -30,6 +33,8 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
     _emailController.addListener(_onFieldChanged);
     _passwordController.addListener(_onFieldChanged);
+    _emailFocus.addListener(() => setState(() {}));
+    _passwordFocus.addListener(() => setState(() {}));
   }
 
   void _onFieldChanged() {
@@ -43,6 +48,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _emailFocus.dispose();
+    _passwordFocus.dispose();
     super.dispose();
   }
 
@@ -98,24 +105,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const lightBg = Color(0xFFF7F9FC);
-
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 440),
-            child: _submitting
-                ? _buildLoadingState()
-                : _buildFormState(lightBg),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(gradient: AppGradients.sky),
+        child: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 440),
+              child: _submitting ? _buildLoadingState() : _buildFormState(),
+            ),
           ),
         ),
       ),
     );
   }
 
-  // -------- 1. Loading state --------
+  // -------- Loading state --------
 
   Widget _buildLoadingState() {
     return Padding(
@@ -123,90 +130,130 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            width: 48,
-            height: 48,
-            child: CircularProgressIndicator(
-              strokeWidth: 3.5,
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                AppColors.beemBlue,
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          const BeemViewWordmark(fontSize: 26),
-          const SizedBox(height: 6),
-          const Text(
-            'Manage your projects,\nget things done.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.grey),
-          ),
-          const SizedBox(height: 40),
+          _logoHeader(),
+          const SizedBox(height: 44),
           const SizedBox(
-            width: 24,
-            height: 24,
-            child: CircularProgressIndicator(
-              strokeWidth: 2.5,
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.beemBlue),
-            ),
+            width: 30,
+            height: 30,
+            child: CircularProgressIndicator(strokeWidth: 3),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           const Text(
             'Signing in...',
-            style: TextStyle(fontSize: 13, color: Colors.grey),
+            style: TextStyle(
+              fontSize: 13.5,
+              color: AppColors.muted,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ],
       ),
     );
   }
 
-  // -------- 2. Form state (empty / filled / error) --------
+  Widget _logoHeader() {
+    return Column(
+      children: [
+        Image.asset(AppAssets.beemviewLogo, width: 72, height: 72),
+        const SizedBox(height: 10),
+        const BeemViewWordmark(fontSize: 30),
+        const SizedBox(height: 6),
+        const Text(
+          'Manage your projects,\nget things done.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            color: AppColors.muted,
+            height: 1.35,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
 
-  Widget _buildFormState(Color lightBg) {
+  // -------- Form state (empty / filled / error) --------
+
+  Widget _field({
+    required TextEditingController controller,
+    required FocusNode focus,
+    required String hint,
+    required IconData icon,
+    required String? Function(String?) validator,
+    TextInputType? keyboardType,
+    TextInputAction? action,
+    Iterable<String>? autofill,
+    bool obscure = false,
+    Widget? suffix,
+    ValueChanged<String>? onSubmitted,
+  }) {
+    final focused = focus.hasFocus;
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 160),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.m),
+        border: Border.all(
+          color: focused ? AppColors.teal : Colors.transparent,
+          width: 2,
+        ),
+        boxShadow: AppShadows.soft,
+      ),
+      child: TextFormField(
+        controller: controller,
+        focusNode: focus,
+        keyboardType: keyboardType,
+        textInputAction: action,
+        autofillHints: autofill,
+        obscureText: obscure,
+        validator: validator,
+        onFieldSubmitted: onSubmitted,
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        decoration: InputDecoration(
+          prefixIcon: Icon(
+            icon,
+            color: focused ? AppColors.teal : AppColors.muted,
+            size: 20,
+          ),
+          suffixIcon: suffix,
+          hintText: hint,
+          hintStyle: const TextStyle(color: AppColors.muted, fontSize: 15),
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 17),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormState() {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
       child: Form(
         key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
-
-            // Header: logo + wordmark + tagline
-            Column(
-              children: [
-                Image.asset(
-                  AppAssets.beemviewLogo,
-                  width: 64,
-                  height: 64,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 12),
-                const BeemViewWordmark(fontSize: 26),
-                const SizedBox(height: 4),
-                const Text(
-                  'Manage your projects,\nget things done.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13, color: Colors.grey),
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 12),
+            _logoHeader(),
+            const SizedBox(height: 28),
 
             // Error banner
             if (_errorMessage != null) ...[
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFDE8E8),
-                  borderRadius: BorderRadius.circular(8),
+                  color: AppColors.dangerTint,
+                  borderRadius: BorderRadius.circular(AppRadius.m),
                 ),
                 child: Row(
                   children: [
                     const Icon(
-                      Icons.warning_amber_rounded,
-                      color: Colors.red,
+                      Icons.error_outline_rounded,
+                      color: AppColors.danger,
                       size: 20,
                     ),
                     const SizedBox(width: 10),
@@ -214,8 +261,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         _errorMessage!,
                         style: const TextStyle(
-                          color: Colors.red,
-                          fontSize: 12,
+                          color: AppColors.danger,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
                           height: 1.3,
                         ),
                       ),
@@ -226,103 +274,75 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 16),
             ],
 
-            // Email
-            Container(
-              decoration: BoxDecoration(
-                color: lightBg,
-                borderRadius: BorderRadius.circular(10),
+            _field(
+              controller: _emailController,
+              focus: _emailFocus,
+              hint: 'Email address',
+              icon: Icons.mail_outline_rounded,
+              validator: _validateEmail,
+              keyboardType: TextInputType.emailAddress,
+              action: TextInputAction.next,
+              autofill: const [AutofillHints.email],
+            ),
+            const SizedBox(height: 14),
+            _field(
+              controller: _passwordController,
+              focus: _passwordFocus,
+              hint: 'Password',
+              icon: Icons.lock_outline_rounded,
+              validator: _validatePassword,
+              action: TextInputAction.done,
+              autofill: const [AutofillHints.password],
+              obscure: _isPasswordObscured,
+              onSubmitted: (_) => _handleSignIn(),
+              suffix: IconButton(
+                icon: Icon(
+                  _isPasswordObscured
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: AppColors.muted,
+                  size: 20,
+                ),
+                onPressed: () =>
+                    setState(() => _isPasswordObscured = !_isPasswordObscured),
               ),
-              child: TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                textInputAction: TextInputAction.next,
-                autofillHints: const [AutofillHints.email],
-                validator: _validateEmail,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(
-                    Icons.mail_outline,
-                    color: Colors.grey,
-                    size: 20,
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      const SnackBar(
+                        content: Text('Password reset — coming soon'),
+                      ),
+                    );
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.teal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 8,
                   ),
-                  hintText: 'Email address',
-                  hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 14),
-                  errorBorder: InputBorder.none,
-                  focusedErrorBorder: InputBorder.none,
+                ),
+                child: const Text(
+                  'Forgot password?',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                 ),
               ),
             ),
-            const SizedBox(height: 12),
-
-            // Password
-            Container(
-              decoration: BoxDecoration(
-                color: lightBg,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: TextFormField(
-                controller: _passwordController,
-                obscureText: _isPasswordObscured,
-                textInputAction: TextInputAction.done,
-                autofillHints: const [AutofillHints.password],
-                validator: _validatePassword,
-                onFieldSubmitted: (_) => _handleSignIn(),
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(
-                    Icons.lock_outline,
-                    color: Colors.grey,
-                    size: 20,
-                  ),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isPasswordObscured
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined,
-                      color: Colors.grey,
-                      size: 20,
-                    ),
-                    onPressed: () => setState(
-                      () => _isPasswordObscured = !_isPasswordObscured,
-                    ),
-                  ),
-                  hintText: 'Password',
-                  hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
-                  errorBorder: InputBorder.none,
-                  focusedErrorBorder: InputBorder.none,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Sign-in button
-            ElevatedButton(
+            const SizedBox(height: 6),
+            GradientButton(
+              label: 'Sign in',
+              height: 56,
               onPressed: _submitting ? null : _handleSignIn,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.beemBlue,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Sign In',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
-              ),
             ),
-
-            const SizedBox(height: 24),
+            const SizedBox(height: 28),
             Center(
               child: Image.asset(
                 AppAssets.laptop,
-                width: 280,
+                width: 300,
                 fit: BoxFit.contain,
               ),
             ),

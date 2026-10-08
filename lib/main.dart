@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'core/api_client.dart';
 import 'core/connectivity_service.dart';
 import 'core/secure_storage.dart';
+import 'core/theme.dart';
 import 'data/repositories/auth_repository.dart';
 import 'data/repositories/project_repository.dart';
 import 'data/repositories/task_repository.dart';
@@ -11,8 +12,8 @@ import 'features/auth/auth_provider.dart';
 import 'features/auth/session_gate.dart';
 import 'features/connectivity/connectivity_provider.dart';
 import 'features/projects/projects_provider.dart';
-import 'features/tasks/project_tasks_provider.dart';
-import 'features/tasks/task_details_provider.dart';
+import 'features/project_tasks/project_tasks_provider.dart';
+import 'features/task_details/task_details_provider.dart';
 import 'shared/widgets/offline_banner.dart';
 
 void main() {
@@ -39,6 +40,16 @@ void main() {
   // 401 → clear session and return to login.
   api.onUnauthorized = authProvider.handleUnauthorized;
 
+  // Session ended (sign out or 401): drop every cached screen's data so the
+  // next user never sees the previous one's projects, tasks or comments.
+  authProvider.addListener(() {
+    if (authProvider.status == AuthStatus.unauthenticated) {
+      projectsProvider.clear();
+      projectTasksProvider.clear();
+      taskDetailsProvider.clear();
+    }
+  });
+
   // Restore session on startup.
   authProvider.restoreSession();
 
@@ -62,12 +73,9 @@ class BeemViewApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'BeemView',
+      title: 'BeemView 360',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light,
       builder: (context, child) => OfflineBanner(child: child!),
       home: const SessionGate(),
     );

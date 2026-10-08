@@ -51,7 +51,7 @@ class Task {
       ),
       startDate: _parseDate(json['startedDate'] ?? json['start_date']),
       dueDate: _parseDate(json['dueDate'] ?? json['due_date']),
-      projectId: (json['projectId'] ?? json['project_id']) as int?,
+      projectId: ((json['projectId'] ?? json['project_id']) as num?)?.toInt(),
       assignees: rawAssignees
           .whereType<Map>()
           .map((e) => Assignee.fromJson(e.cast<String, dynamic>()))

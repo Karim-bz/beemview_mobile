@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 
-import '../../core/colors.dart';
+import '../../shared/widgets/app_bottom_nav.dart';
 import '../notifications/notifications_screen.dart';
 import '../profile/profile_screen.dart';
 import '../projects/projects_screen.dart';
+import '../tasks/tasks_screen.dart';
+
+/// Lets any screen switch the active bottom-nav tab.
+final ValueNotifier<int> shellIndex = ValueNotifier<int>(0);
+
+/// Shared tap handling for the bottom nav (the Tasks tab is a placeholder).
+void onShellTabTap(BuildContext context, int index) {
+  shellIndex.value = index;
+}
 
 /// Root screen for authenticated users.
 class MainShell extends StatefulWidget {
@@ -14,94 +23,31 @@ class MainShell extends StatefulWidget {
 }
 
 class _MainShellState extends State<MainShell> {
-  int _index = 0;
-
-  static const _tabs = [
-    _TabSpec(
-      label: 'Projects',
-      icon: Icons.folder_outlined,
-      activeIcon: Icons.folder_rounded,
-    ),
-    _TabSpec(
-      label: 'Tasks',
-      icon: Icons.check_box_outlined,
-      activeIcon: Icons.check_box_rounded,
-    ),
-    _TabSpec(
-      label: 'Notifications',
-      icon: Icons.notifications_none_rounded,
-      activeIcon: Icons.notifications_rounded,
-    ),
-    _TabSpec(
-      label: 'Profile',
-      icon: Icons.person_outline_rounded,
-      activeIcon: Icons.person_rounded,
-    ),
-  ];
-
-  void _onTap(int index) {
-    // Only Projects and Profile are wired. Others are placeholders.
-    if (index != 1) {
-      setState(() => _index = index);
-      return;
-    }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('${_tabs[index].label} — coming soon')),
-    );
+  @override
+  void initState() {
+    super.initState();
+    shellIndex.value = 0;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: IndexedStack(
-        index: _index,
-        children: const [
-          ProjectsScreen(),
-          SizedBox.shrink(), // Tasks placeholder (unused)
-          NotificationsScreen(),
-          ProfileScreen(),
-        ],
-      ),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: Color(0xFFEEEEEE), width: 1)),
+    return ValueListenableBuilder<int>(
+      valueListenable: shellIndex,
+      builder: (context, index, _) => Scaffold(
+        body: IndexedStack(
+          index: index,
+          children: const [
+            ProjectsScreen(),
+            TasksScreen(),
+            NotificationsScreen(),
+            ProfileScreen(),
+          ],
         ),
-        child: BottomNavigationBar(
-          currentIndex: _index,
-          onTap: _onTap,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          selectedItemColor: AppColors.beemBlue,
-          unselectedItemColor: Colors.grey,
-          selectedLabelStyle: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-          ),
-          unselectedLabelStyle: const TextStyle(fontSize: 11),
-          items: _tabs
-              .map(
-                (t) => BottomNavigationBarItem(
-                  icon: Icon(t.icon),
-                  activeIcon: Icon(t.activeIcon),
-                  label: t.label,
-                ),
-              )
-              .toList(),
+        bottomNavigationBar: AppBottomNav(
+          currentIndex: index,
+          onTap: (i) => onShellTabTap(context, i),
         ),
       ),
     );
   }
-}
-
-class _TabSpec {
-  const _TabSpec({
-    required this.label,
-    required this.icon,
-    required this.activeIcon,
-  });
-
-  final String label;
-  final IconData icon;
-  final IconData activeIcon;
 }

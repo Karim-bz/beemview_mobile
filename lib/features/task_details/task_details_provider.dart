@@ -33,6 +33,10 @@ class TaskDetailsProvider extends ChangeNotifier {
   String? _error;
   int? _taskId;
 
+  /// Bumped by every load and by [clear]. A response that comes back with
+  /// an old token belongs to a replaced request and is dropped.
+  int _loadToken = 0;
+
   // ---- Submit state ----
   bool _submitting = false;
   SubmitOutcome? _lastOutcome;
@@ -76,7 +80,32 @@ class TaskDetailsProvider extends ChangeNotifier {
 
   // ---- Load ----
 
+  /// Forgets everything (used when the session ends).
+  void clear() {
+    _loadToken++;
+    _status = DetailsStatus.idle;
+    _task = null;
+    _taskId = null;
+    _error = null;
+    _submitting = false;
+    _lastOutcome = null;
+    _lastSubmitError = null;
+    _pendingNote = null;
+    _localComments.clear();
+    notifyListeners();
+  }
+
   Future<void> load(int taskId) async {
+    final token = ++_loadToken;
+
+    if (_taskId != taskId) {
+      // Switching tasks: nothing from the previous one may leak into this
+      // screen (task body, comment bar, local comments, retry note...).
+      _task = null;
+      _pendingNote = null;
+      _lastOutcome = null;
+      _lastSubmitError = null;
+    }
     _taskId = taskId;
     _status = DetailsStatus.loading;
     _error = null;
@@ -84,9 +113,12 @@ class TaskDetailsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _task = await _repo.fetchTask(taskId);
+      final task = await _repo.fetchTask(taskId);
+      if (token != _loadToken) return;
+      _task = task;
       _status = DetailsStatus.loaded;
     } on ApiException catch (e) {
+      if (token != _loadToken) return;
       _error = e.message;
       _status = DetailsStatus.error;
     }
@@ -111,7 +143,8 @@ class TaskDetailsProvider extends ChangeNotifier {
     String? authorName,
   }) async {
     if (_submitting) return SubmitOutcome.ignored;
-    if (_taskId == null) return SubmitOutcome.ignored;
+    final taskId = _taskId;
+    if (taskId == null) return SubmitOutcome.ignored;
 
     _submitting = true;
     _lastOutcome = null;
@@ -121,7 +154,7 @@ class TaskDetailsProvider extends ChangeNotifier {
 
     // --- Step A: status update ---
     try {
-      await _repo.updateStatus(taskId: _taskId!, status: status);
+      await _repo.updateStatus(taskId: taskId, status: status);
     } on ApiException catch (e) {
       _submitting = false;
       _lastOutcome = SubmitOutcome.failure;
@@ -134,18 +167,11 @@ class TaskDetailsProvider extends ChangeNotifier {
     final trimmed = note?.trim() ?? '';
     if (trimmed.isNotEmpty) {
       try {
-        await _repo.addComment(taskId: _taskId!, content: trimmed);
-        _localComments.add(
-          Comment(
-            id: -1,
-            content: trimmed,
-            authorName: authorName ?? 'You',
-            createdAt: DateTime.now(),
-          ),
-        );
+        await _repo.addComment(taskId: taskId, content: trimmed);
+        _echoComment(taskId, trimmed, authorName);
       } on ApiException catch (e) {
         // Status saved, comment failed. Preserve the note for retry.
-        _pendingNote = trimmed;
+        if (_taskId == taskId) _pendingNote = trimmed;
         _submitting = false;
         _lastOutcome = SubmitOutcome.partialSuccess;
         _lastSubmitError = e.message;
@@ -172,7 +198,8 @@ class TaskDetailsProvider extends ChangeNotifier {
     String? authorName,
   }) async {
     if (_submitting) return SubmitOutcome.ignored;
-    if (_taskId == null) return SubmitOutcome.ignored;
+    final taskId = _taskId;
+    if (taskId == null) return SubmitOutcome.ignored;
 
     final trimmed = content.trim();
     if (trimmed.isEmpty) return SubmitOutcome.ignored;
@@ -183,15 +210,8 @@ class TaskDetailsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _repo.addComment(taskId: _taskId!, content: trimmed);
-      _localComments.add(
-        Comment(
-          id: -1,
-          content: trimmed,
-          authorName: authorName ?? 'You',
-          createdAt: DateTime.now(),
-        ),
-      );
+      await _repo.addComment(taskId: taskId, content: trimmed);
+      _echoComment(taskId, trimmed, authorName);
       _submitting = false;
       _lastOutcome = SubmitOutcome.fullSuccess;
       notifyListeners();
@@ -211,22 +231,16 @@ class TaskDetailsProvider extends ChangeNotifier {
   Future<SubmitOutcome> retryPendingComment({String? authorName}) async {
     final note = _pendingNote;
     if (note == null || note.isEmpty) return SubmitOutcome.ignored;
-    if (_submitting || _taskId == null) return SubmitOutcome.ignored;
+    final taskId = _taskId;
+    if (_submitting || taskId == null) return SubmitOutcome.ignored;
 
     _submitting = true;
     _lastSubmitError = null;
     notifyListeners();
 
     try {
-      await _repo.addComment(taskId: _taskId!, content: note);
-      _localComments.add(
-        Comment(
-          id: -1,
-          content: note,
-          authorName: authorName ?? 'You',
-          createdAt: DateTime.now(),
-        ),
-      );
+      await _repo.addComment(taskId: taskId, content: note);
+      _echoComment(taskId, note, authorName);
       _pendingNote = null;
       _submitting = false;
       _lastOutcome = SubmitOutcome.fullSuccess;
@@ -249,11 +263,29 @@ class TaskDetailsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Shows a just-posted comment right away, but only if the screen is still
+  /// on the task it was posted to.
+  void _echoComment(int taskId, String content, String? authorName) {
+    if (_taskId != taskId) return;
+    _localComments.add(
+      Comment(
+        id: -1,
+        content: content,
+        authorName: authorName ?? 'You',
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
   /// Re-fetches the task without toggling loading/error state.
   Future<void> _refreshQuietly() async {
-    if (_taskId == null) return;
+    final id = _taskId;
+    if (id == null) return;
+    final token = _loadToken;
     try {
-      _task = await _repo.fetchTask(_taskId!);
+      final task = await _repo.fetchTask(id);
+      if (token != _loadToken) return;
+      _task = task;
       _localComments.clear();
       _status = DetailsStatus.loaded;
     } on ApiException {

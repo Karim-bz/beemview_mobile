@@ -1,6 +1,7 @@
 import 'package:beemview_mobile/core/api_paths.dart';
 
 import '../../core/api_client.dart';
+import '../models/new_project.dart';
 import '../models/project.dart';
 
 /// Result of a single projects page fetch.
@@ -33,5 +34,13 @@ class ProjectRepository {
     final total = (body['total'] as num?)?.toInt() ?? items.length;
 
     return ProjectsPage(items: items, total: total);
+  }
+
+  /// POST /projects. Throws [ApiException] on failure.
+  Future<void> createProject(NewProject project) async {
+    await _api.post<Map<String, dynamic>>(
+      ApiPaths.projects,
+      data: project.toJson(),
+    );
   }
 }
