@@ -2,9 +2,19 @@ import 'package:flutter/foundation.dart';
 
 import '../../core/api_exception.dart';
 import '../../data/models/project.dart';
+import '../../data/models/task.dart';
 import '../../data/repositories/project_repository.dart';
 
 enum ProjectsStatus { idle, loading, loaded, error }
+
+/// Personal task counters shown on the profile screen.
+class TaskStats {
+  const TaskStats({this.completed = 0, this.inProgress = 0, this.overdue = 0});
+
+  final int completed;
+  final int inProgress;
+  final int overdue;
+}
 
 class ProjectsProvider extends ChangeNotifier {
   ProjectsProvider(this._repo);
@@ -24,6 +34,53 @@ class ProjectsProvider extends ChangeNotifier {
   bool get isLoadingMore => _loadingMore;
   bool get hasMore => _projects.length < _total;
   bool get isEmpty => _status == ProjectsStatus.loaded && _projects.isEmpty;
+
+  /// Counts the user's tasks across the projects loaded so far.
+  /// (Derived from the tasks embedded in each project payload.)
+  TaskStats statsFor(int? userId) {
+    if (userId == null) return const TaskStats();
+    final today = DateTime.now();
+    final startOfToday = DateTime(today.year, today.month, today.day);
+    var completed = 0, inProgress = 0, overdue = 0;
+    for (final p in _projects) {
+      for (final t in p.tasks) {
+        if (!t.assigneeIds.contains(userId)) continue;
+        if (t.status == 'done') {
+          completed++;
+          continue;
+        }
+        if (t.status == 'canceled') continue;
+        if (t.status == 'in_progress') inProgress++;
+        if (t.dueDate != null && t.dueDate!.isBefore(startOfToday)) overdue++;
+      }
+    }
+    return TaskStats(
+      completed: completed,
+      inProgress: inProgress,
+      overdue: overdue,
+    );
+  }
+
+  /// Open (not done / canceled) tasks assigned to [userId] across the
+  /// projects loaded so far, soonest due date first.
+  List<Task> myOpenTasks(int? userId) {
+    if (userId == null) return const [];
+    final out = <Task>[];
+    for (final p in _projects) {
+      for (final t in p.tasks) {
+        if (!t.assigneeIds.contains(userId)) continue;
+        if (t.status == 'done' || t.status == 'canceled') continue;
+        final task = t.toTask(p.id);
+        if (task != null) out.add(task);
+      }
+    }
+    out.sort((a, b) {
+      final ad = a.dueDate ?? DateTime(9999);
+      final bd = b.dueDate ?? DateTime(9999);
+      return ad.compareTo(bd);
+    });
+    return out;
+  }
 
   /// Loads the first page (or reloads from scratch).
   Future<void> load() async {

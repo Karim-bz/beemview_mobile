@@ -41,30 +41,41 @@ class SplashLoading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                AppAssets.beemviewLogo,
-                width: 72,
-                height: 72,
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 16),
-              const BeemViewWordmark(fontSize: 26),
-              const SizedBox(height: 40),
-              const SizedBox(
-                width: 28,
-                height: 28,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.beemBlue),
+      body: Container(
+        decoration: const BoxDecoration(gradient: AppGradients.splash),
+        child: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 124,
+                  height: 124,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(36),
+                    boxShadow: AppShadows.soft,
+                  ),
+                  child: Image.asset(
+                    AppAssets.beemviewLogo,
+                    fit: BoxFit.contain,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 22),
+                const BeemViewWordmark(fontSize: 36),
+                const SizedBox(height: 48),
+                const SizedBox(
+                  width: 34,
+                  height: 34,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.teal),
+                    backgroundColor: Color(0x1A1F92BC),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -97,12 +108,18 @@ class SessionRetryView extends StatelessWidget {
                 const Icon(
                   Icons.wifi_off_rounded,
                   size: 44,
-                  color: Colors.grey,
+                  color: AppColors.muted,
                 ),
                 const SizedBox(height: 12),
                 Text(message, textAlign: TextAlign.center),
                 const SizedBox(height: 16),
-                FilledButton(onPressed: onRetry, child: const Text('Retry')),
+                FilledButton(
+                  onPressed: onRetry,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.teal,
+                  ),
+                  child: const Text('Retry'),
+                ),
                 TextButton(onPressed: onSignOut, child: const Text('Sign out')),
               ],
             ),
