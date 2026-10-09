@@ -204,7 +204,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
     final hasUnits = units.isNotEmpty;
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: context.palette.canvas,
       body: SafeArea(
         child: Column(
           children: [
@@ -330,9 +330,9 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                             padding: const EdgeInsets.only(top: 6, right: 4),
                             child: Text(
                               '${_descriptionController.text.length} / $_maxDescriptionLength',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11.5,
-                                color: AppColors.hint,
+                                color: context.palette.hint,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -388,11 +388,11 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
           ? null
           : Icon(
               icon,
-              color: focused ? AppColors.teal : AppColors.muted,
+              color: focused ? AppColors.teal : context.palette.muted,
               size: 20,
             ),
       hintText: hint,
-      hintStyle: const TextStyle(color: AppColors.muted, fontSize: 15),
+      hintStyle: TextStyle(color: context.palette.muted, fontSize: 15),
       counterText: hideCounter ? '' : null,
       border: InputBorder.none,
       enabledBorder: InputBorder.none,
@@ -443,7 +443,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
               Icon(
                 Icons.apartment_rounded,
                 size: 20,
-                color: unit == null ? AppColors.muted : AppColors.teal,
+                color: unit == null ? context.palette.muted : AppColors.teal,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -454,13 +454,13 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
-                    color: unit == null ? AppColors.muted : AppColors.ink,
+                    color: unit == null ? context.palette.muted : context.palette.ink,
                   ),
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: AppColors.hint,
+                color: context.palette.hint,
               ),
             ],
           ),
@@ -508,7 +508,7 @@ class _StatusChip extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? color : Colors.white,
+          color: selected ? color : context.palette.surface,
           borderRadius: BorderRadius.circular(20),
           boxShadow: selected ? AppShadows.glow(color) : AppShadows.soft,
         ),
@@ -529,7 +529,7 @@ class _StatusChip extends StatelessWidget {
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: selected ? Colors.white : AppColors.ink,
+                color: selected ? Colors.white : context.palette.ink,
               ),
             ),
           ],
@@ -600,7 +600,7 @@ class _UnitTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       child: Material(
-        color: selected ? AppColors.tealTint : Colors.transparent,
+        color: selected ? context.palette.tealTint : Colors.transparent,
         borderRadius: BorderRadius.circular(AppRadius.m),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppRadius.m),
@@ -613,7 +613,7 @@ class _UnitTile extends StatelessWidget {
                   width: 34,
                   height: 34,
                   decoration: BoxDecoration(
-                    color: AppColors.tealTint,
+                    color: context.palette.tealTint,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -629,7 +629,7 @@ class _UnitTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-                      color: selected ? AppColors.tealDark : AppColors.ink,
+                      color: selected ? AppColors.tealDark : context.palette.ink,
                     ),
                   ),
                 ),

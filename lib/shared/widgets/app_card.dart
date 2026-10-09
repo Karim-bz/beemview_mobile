@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/colors.dart';
 
-/// White, borderless card with a soft shadow.
+/// Borderless card with a soft shadow (surface color of the current theme).
 class AppCard extends StatelessWidget {
   const AppCard({
     super.key,
@@ -10,20 +10,20 @@ class AppCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(16),
     this.radius = AppRadius.l,
     this.onTap,
-    this.color = Colors.white,
+    this.color,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
   final double radius;
   final VoidCallback? onTap;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: color,
+        color: color ?? context.palette.surface,
         borderRadius: BorderRadius.circular(radius),
         boxShadow: AppShadows.soft,
       ),
@@ -52,16 +52,16 @@ class SquareBackButton extends StatelessWidget {
       width: 44,
       height: 44,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(14),
         boxShadow: AppShadows.soft,
       ),
       child: IconButton(
         padding: EdgeInsets.zero,
-        icon: const Icon(
+        icon: Icon(
           Icons.arrow_back_rounded,
           size: 20,
-          color: AppColors.ink,
+          color: context.palette.ink,
         ),
         onPressed: onPressed ?? () => Navigator.of(context).maybePop(),
       ),
@@ -81,7 +81,7 @@ class SearchField extends StatelessWidget {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(AppRadius.m),
         boxShadow: AppShadows.soft,
       ),
@@ -89,13 +89,13 @@ class SearchField extends StatelessWidget {
         controller: controller,
         style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
         decoration: InputDecoration(
-          prefixIcon: const Icon(
+          prefixIcon: Icon(
             Icons.search_rounded,
-            color: AppColors.muted,
+            color: context.palette.muted,
             size: 20,
           ),
           hintText: hint,
-          hintStyle: const TextStyle(color: AppColors.muted, fontSize: 14),
+          hintStyle: TextStyle(color: context.palette.muted, fontSize: 14),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 14),
         ),
@@ -123,14 +123,14 @@ class FilterPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = selected ? Colors.white : AppColors.ink;
+    final fg = selected ? Colors.white : context.palette.ink;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? AppColors.teal : Colors.white,
+          color: selected ? AppColors.teal : context.palette.surface,
           borderRadius: BorderRadius.circular(20),
           boxShadow: selected ? AppShadows.glow(AppColors.teal) : null,
         ),
@@ -162,7 +162,7 @@ class FilterPill extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: FontWeight.w600,
-                color: selected ? Colors.white70 : AppColors.muted,
+                color: selected ? Colors.white70 : context.palette.muted,
               ),
             ),
           ],

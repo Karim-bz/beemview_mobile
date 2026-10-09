@@ -38,9 +38,9 @@ class PendingNoteBanner extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.info_outline_rounded, size: 18, color: AppColors.ink),
+              Icon(Icons.info_outline_rounded, size: 18, color: context.palette.ink),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -59,10 +59,10 @@ class PendingNoteBanner extends StatelessWidget {
           ),
           if (maybeSent) ...[
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'The connection dropped, so the note may have been delivered. '
               'Pull to refresh and check the comments before retrying.',
-              style: TextStyle(fontSize: 12.5, color: AppColors.muted),
+              style: TextStyle(fontSize: 12.5, color: context.palette.muted),
             ),
           ],
           const SizedBox(height: 10),

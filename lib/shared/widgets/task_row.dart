@@ -18,14 +18,14 @@ class TaskRow extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(AppRadius.m),
         boxShadow: AppShadows.soft,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(AppRadius.m),
         child: Material(
-          color: Colors.white,
+          color: context.palette.surface,
           child: InkWell(
             onTap: onTap,
             child: IntrinsicHeight(
@@ -52,9 +52,9 @@ class TaskRow extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              const Icon(
+                              Icon(
                                 Icons.chevron_right_rounded,
-                                color: AppColors.hint,
+                                color: context.palette.hint,
                                 size: 20,
                               ),
                             ],
@@ -100,7 +100,7 @@ class _DueLabel extends StatelessWidget {
         ? AppColors.orange
         : overdue
         ? AppColors.danger
-        : AppColors.muted;
+        : context.palette.muted;
 
     final text = isToday
         ? 'Today'

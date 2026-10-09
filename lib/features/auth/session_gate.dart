@@ -42,7 +42,7 @@ class SplashLoading extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppGradients.splash),
+        decoration: BoxDecoration(gradient: context.palette.splashGradient),
         child: SafeArea(
           child: Center(
             child: Column(
@@ -53,7 +53,7 @@ class SplashLoading extends StatelessWidget {
                   height: 124,
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.palette.surface,
                     borderRadius: BorderRadius.circular(36),
                     boxShadow: AppShadows.soft,
                   ),
@@ -105,10 +105,10 @@ class SessionRetryView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
+                Icon(
                   Icons.wifi_off_rounded,
                   size: 44,
-                  color: AppColors.muted,
+                  color: context.palette.muted,
                 ),
                 const SizedBox(height: 12),
                 Text(message, textAlign: TextAlign.center),

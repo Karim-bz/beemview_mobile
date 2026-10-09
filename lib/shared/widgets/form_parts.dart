@@ -13,17 +13,18 @@ InputDecoration formInputDecoration({
   required bool focused,
   IconData? icon,
   EdgeInsets padding = const EdgeInsets.symmetric(vertical: 17),
+  required dynamic context,
 }) {
   return InputDecoration(
     prefixIcon: icon == null
         ? null
         : Icon(
             icon,
-            color: focused ? AppColors.teal : AppColors.muted,
+            color: focused ? AppColors.teal : context.palette.muted,
             size: 20,
           ),
     hintText: hint,
-    hintStyle: const TextStyle(color: AppColors.muted, fontSize: 15),
+    hintStyle: TextStyle(color: context.palette.muted, fontSize: 15),
     counterText: '',
     border: InputBorder.none,
     enabledBorder: InputBorder.none,
@@ -51,10 +52,10 @@ class FormLabel extends StatelessWidget {
       padding: const EdgeInsets.only(left: 4, bottom: 8),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w700,
-          color: AppColors.muted,
+          color: context.palette.muted,
         ),
       ),
     );
@@ -95,7 +96,7 @@ class InputCard extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 160),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(AppRadius.m),
         border: Border.all(
           color: focused ? AppColors.teal : Colors.transparent,
@@ -118,7 +119,7 @@ class FormErrorBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.dangerTint,
+        color: context.palette.dangerTint,
         borderRadius: BorderRadius.circular(AppRadius.m),
       ),
       child: Row(
@@ -182,7 +183,7 @@ class DateTile extends StatelessWidget {
             Icon(
               Icons.calendar_today_rounded,
               size: 18,
-              color: date == null ? AppColors.muted : AppColors.teal,
+              color: date == null ? context.palette.muted : AppColors.teal,
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -191,9 +192,9 @@ class DateTile extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11.5,
-                      color: AppColors.muted,
+                      color: context.palette.muted,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -205,7 +206,9 @@ class DateTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
-                      color: date == null ? AppColors.muted : AppColors.ink,
+                      color: date == null
+                          ? context.palette.muted
+                          : context.palette.ink,
                     ),
                   ),
                 ],
@@ -215,12 +218,12 @@ class DateTile extends StatelessWidget {
               GestureDetector(
                 onTap: onClear,
                 behavior: HitTestBehavior.opaque,
-                child: const Padding(
+                child: Padding(
                   padding: EdgeInsets.all(4),
                   child: Icon(
                     Icons.close_rounded,
                     size: 18,
-                    color: AppColors.hint,
+                    color: context.palette.hint,
                   ),
                 ),
               ),
@@ -252,14 +255,14 @@ class ChoicePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fg = selected ? Colors.white : AppColors.ink;
+    final fg = selected ? Colors.white : context.palette.ink;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? color : Colors.white,
+          color: selected ? color : context.palette.surface,
           borderRadius: BorderRadius.circular(20),
           boxShadow: selected ? AppShadows.glow(color) : AppShadows.soft,
         ),

@@ -90,12 +90,12 @@ class _StatusUpdateSheetState extends State<_StatusUpdateSheet> {
               Row(
                 children: [
                   StatusPill(status: widget.current),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10),
                     child: Icon(
                       Icons.arrow_forward_rounded,
                       size: 18,
-                      color: AppColors.muted,
+                      color: context.palette.muted,
                     ),
                   ),
                   StatusPill(status: widget.selected, large: true),
@@ -118,16 +118,16 @@ class _StatusUpdateSheetState extends State<_StatusUpdateSheet> {
                 style: const TextStyle(fontSize: 15, height: 1.4),
                 decoration: InputDecoration(
                   hintText: 'Add a note (optional). Posted as a comment.',
-                  hintStyle: const TextStyle(
+                  hintStyle: TextStyle(
                     fontSize: 15,
-                    color: AppColors.hint,
+                    color: context.palette.hint,
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: context.palette.surface,
                   contentPadding: const EdgeInsets.all(16),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.l),
-                    borderSide: const BorderSide(color: AppColors.track),
+                    borderSide: BorderSide(color: context.palette.track),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.l),
@@ -143,9 +143,9 @@ class _StatusUpdateSheetState extends State<_StatusUpdateSheet> {
                 alignment: Alignment.centerRight,
                 child: Text(
                   '${_controller.text.length} / $kMaxCommentLength',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11.5,
-                    color: AppColors.hint,
+                    color: context.palette.hint,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -160,9 +160,9 @@ class _StatusUpdateSheetState extends State<_StatusUpdateSheet> {
                       child: OutlinedButton(
                         onPressed: () => Navigator.of(context).pop(),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.ink,
-                          backgroundColor: Colors.white,
-                          side: const BorderSide(color: AppColors.track),
+                          foregroundColor: context.palette.ink,
+                          backgroundColor: context.palette.surface,
+                          side: BorderSide(color: context.palette.track),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(AppRadius.m),
                           ),

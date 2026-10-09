@@ -96,7 +96,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     final name = user?.fullName ?? '';
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: context.palette.canvas,
       floatingActionButton: _AddButton(onTap: _openNewProject),
       body: SafeArea(
         bottom: false,
@@ -144,14 +144,14 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.palette.surface,
             borderRadius: BorderRadius.circular(AppRadius.m),
             boxShadow: AppShadows.soft,
           ),
           child: IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.tune_rounded,
-              color: AppColors.ink,
+              color: context.palette.ink,
               size: 20,
             ),
             padding: EdgeInsets.zero,
@@ -280,7 +280,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           onPressed: () => context.read<ProjectsProvider>().loadMore(),
           style: TextButton.styleFrom(
             foregroundColor: AppColors.teal,
-            backgroundColor: AppColors.tealTint,
+            backgroundColor: context.palette.tealTint,
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(AppRadius.m),
@@ -319,9 +319,9 @@ class _Header extends StatelessWidget {
             children: [
               Text(
                 greeting,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.muted,
+                  color: context.palette.muted,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -346,11 +346,11 @@ class _Header extends StatelessWidget {
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white,
-              border: Border.all(color: AppColors.tealTint, width: 3),
+              color: context.palette.surface,
+              border: Border.all(color: context.palette.tealTint, width: 3),
             ),
             child: CircleAvatar(
-              backgroundColor: AppColors.tealTint,
+              backgroundColor: context.palette.tealTint,
               child: Text(
                 initials,
                 style: const TextStyle(
@@ -458,18 +458,18 @@ class _ProjectCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       project.organizationalUnit?.name ?? '-',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
-                        color: AppColors.muted,
+                        color: context.palette.muted,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
-                color: AppColors.hint,
+                color: context.palette.hint,
                 size: 22,
               ),
             ],
@@ -484,7 +484,7 @@ class _ProjectCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: tasks == 0 ? FontWeight.w500 : FontWeight.w700,
-                  color: tasks == 0 ? AppColors.muted : AppColors.ink,
+                  color: tasks == 0 ? context.palette.muted : context.palette.ink,
                 ),
               ),
               const Spacer(),

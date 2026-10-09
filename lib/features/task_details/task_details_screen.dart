@@ -149,7 +149,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final provider = context.watch<TaskDetailsProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: context.palette.canvas,
       body: SafeArea(
         child: Column(
           children: [
@@ -280,7 +280,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               fontSize: 14,
               height: 1.5,
               fontWeight: FontWeight.w500,
-              color: hasDescription ? AppColors.muted : AppColors.hint,
+              color: hasDescription ? context.palette.muted : context.palette.hint,
             ),
           ),
           const SizedBox(height: 18),
@@ -339,11 +339,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             runSpacing: 8,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Text(
+              Text(
                 'Assignees',
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.muted,
+                  color: context.palette.muted,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -356,11 +356,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           // ---- Comments ----
           Row(
             children: [
-              const Text(
+              Text(
                 'Comments',
                 style: TextStyle(
                   fontSize: 13,
-                  color: AppColors.muted,
+                  color: context.palette.muted,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -368,9 +368,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               if (comments.isNotEmpty)
                 Text(
                   '${comments.length}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: AppColors.muted,
+                    color: context.palette.muted,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -378,11 +378,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           ),
           const SizedBox(height: 12),
           if (comments.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Text(
                 'No comments yet.',
-                style: TextStyle(fontSize: 13.5, color: AppColors.hint),
+                style: TextStyle(fontSize: 13.5, color: context.palette.hint),
               ),
             )
           else

@@ -23,9 +23,9 @@ class LoadingView extends StatelessWidget {
             const SizedBox(height: 14),
             Text(
               message!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: AppColors.muted,
+                color: context.palette.muted,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -129,9 +129,9 @@ class EmptyView extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
-                color: AppColors.muted,
+                color: context.palette.muted,
                 fontWeight: FontWeight.w500,
               ),
             ),

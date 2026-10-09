@@ -9,7 +9,7 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: context.palette.canvas,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -43,14 +43,14 @@ class NotificationsScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'Comments, status changes and new\n'
                         'assignments will show up here.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
                           height: 1.45,
-                          color: AppColors.muted,
+                          color: context.palette.muted,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -59,7 +59,7 @@ class NotificationsScreen extends StatelessWidget {
                         onPressed: () => onShellTabTap(context, 1),
                         style: TextButton.styleFrom(
                           foregroundColor: AppColors.teal,
-                          backgroundColor: AppColors.tealTint,
+                          backgroundColor: context.palette.tealTint,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 26,
                             vertical: 14,
@@ -104,7 +104,7 @@ class _BellIllustration extends StatelessWidget {
             width: 190,
             height: 130,
             decoration: BoxDecoration(
-              color: AppColors.tealTint,
+              color: context.palette.tealTint,
               borderRadius: BorderRadius.circular(70),
             ),
           ),

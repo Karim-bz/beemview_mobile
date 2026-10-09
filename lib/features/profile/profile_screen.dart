@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../core/colors.dart';
 import '../../shared/widgets/app_card.dart';
 import '../../shared/widgets/initials_avatar.dart';
+import '../appearance/appearance_sheet.dart';
+import '../appearance/theme_provider.dart';
 import '../auth/auth_provider.dart';
 import '../projects/projects_provider.dart';
 
@@ -22,7 +24,7 @@ class ProfileScreen extends StatelessWidget {
     final stats = context.watch<ProjectsProvider>().statsFor(user?.id);
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: context.palette.canvas,
       body: SafeArea(
         bottom: false,
         child: ListView(
@@ -60,8 +62,8 @@ class ProfileScreen extends StatelessWidget {
                     icon: Icons.dark_mode_outlined,
                     color: const Color(0xFF7B61FF),
                     label: 'Appearance',
-                    value: 'Light',
-                    onTap: () => _comingSoon(context, 'Appearance'),
+                    value: themeModeLabel(context.watch<ThemeProvider>().mode),
+                    onTap: () => showAppearanceSheet(context),
                   ),
                   _SettingsRow(
                     icon: Icons.public_rounded,
@@ -93,7 +95,7 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.danger,
-                  backgroundColor: AppColors.dangerTint,
+                  backgroundColor: context.palette.dangerTint,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppRadius.l),
                   ),
@@ -310,17 +312,17 @@ class _SettingsRow extends StatelessWidget {
                 padding: const EdgeInsets.only(right: 6),
                 child: Text(
                   value!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: AppColors.muted,
+                    color: context.palette.muted,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
             if (!notClickable!)
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
-                color: AppColors.hint,
+                color: context.palette.hint,
                 size: 20,
               ),
           ],

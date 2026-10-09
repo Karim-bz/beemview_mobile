@@ -22,7 +22,7 @@ class TasksScreen extends StatelessWidget {
     final tasks = projects.myOpenTasks(userId);
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: context.palette.canvas,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -44,9 +44,9 @@ class TasksScreen extends StatelessWidget {
                   if (tasks.isNotEmpty)
                     Text(
                       '${tasks.length} open · ${_dueTodayCount(tasks)} due today',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 13,
-                        color: AppColors.muted,
+                        color: context.palette.muted,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -115,7 +115,7 @@ class _TaskList extends StatelessWidget {
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
-              color: key == 'Overdue' ? AppColors.danger : AppColors.muted,
+              color: key == 'Overdue' ? AppColors.danger : context.palette.muted,
             ),
           ),
         ),
@@ -163,14 +163,14 @@ class _EmptyTasks extends StatelessWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Tasks assigned to you will show up here.\n'
               'Pick a project to get started.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
                 height: 1.45,
-                color: AppColors.muted,
+                color: context.palette.muted,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -179,7 +179,7 @@ class _EmptyTasks extends StatelessWidget {
               onPressed: () => shellIndex.value = 0,
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.teal,
-                backgroundColor: AppColors.tealTint,
+                backgroundColor: context.palette.tealTint,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 26,
                   vertical: 14,
@@ -216,7 +216,7 @@ class _ChecklistIllustration extends StatelessWidget {
             width: 190,
             height: 130,
             decoration: BoxDecoration(
-              color: AppColors.tealTint,
+              color: context.palette.tealTint,
               borderRadius: BorderRadius.circular(70),
             ),
           ),
@@ -226,8 +226,8 @@ class _ChecklistIllustration extends StatelessWidget {
             child: Container(
               width: 70,
               height: 70,
-              decoration: const BoxDecoration(
-                color: Color(0xFFD6ECF6),
+              decoration: BoxDecoration(
+                color: AppColors.teal.withValues(alpha: 0.18),
                 shape: BoxShape.circle,
               ),
             ),
@@ -237,16 +237,16 @@ class _ChecklistIllustration extends StatelessWidget {
             height: 96,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.palette.surface,
               borderRadius: BorderRadius.circular(18),
               boxShadow: AppShadows.soft,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _row(AppColors.teal, checked: true),
-                _row(AppColors.green, checked: true),
-                _row(AppColors.orange, checked: false),
+                _row(context, AppColors.teal, checked: true),
+                _row(context, AppColors.green, checked: true),
+                _row(context, AppColors.orange, checked: false),
               ],
             ),
           ),
@@ -267,7 +267,7 @@ class _ChecklistIllustration extends StatelessWidget {
     );
   }
 
-  Widget _row(Color c, {required bool checked}) => Row(
+  Widget _row(BuildContext context, Color c, {required bool checked}) => Row(
     children: [
       Container(
         width: 16,
@@ -286,7 +286,7 @@ class _ChecklistIllustration extends StatelessWidget {
         child: Container(
           height: 5,
           decoration: BoxDecoration(
-            color: AppColors.track,
+            color: context.palette.track,
             borderRadius: BorderRadius.circular(3),
           ),
         ),

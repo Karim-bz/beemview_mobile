@@ -37,11 +37,11 @@ class AppBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.palette.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.ink.withValues(alpha: 0.06),
+            color: context.palette.ink.withValues(alpha: 0.06),
             blurRadius: 24,
             offset: const Offset(0, -6),
           ),
@@ -85,7 +85,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppColors.teal : AppColors.muted;
+    final color = selected ? AppColors.teal : context.palette.muted;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -97,7 +97,7 @@ class _NavItem extends StatelessWidget {
             width: 56,
             height: 32,
             decoration: BoxDecoration(
-              color: selected ? AppColors.tealTint : Colors.transparent,
+              color: selected ? context.palette.tealTint : Colors.transparent,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Stack(
@@ -118,7 +118,7 @@ class _NavItem extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: AppColors.orange,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 1.5),
+                        border: Border.all(color: context.palette.surface, width: 1.5),
                       ),
                     ),
                   ),
