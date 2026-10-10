@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../l10n/app_strings.dart';
+
 /// Keeps the theme choice (system, light or dark) and saves it on the phone.
 class ThemeProvider extends ChangeNotifier {
   static const _key = 'theme_mode';
@@ -38,13 +40,13 @@ class ThemeProvider extends ChangeNotifier {
   }
 }
 
-String themeModeLabel(ThemeMode mode) {
+String themeModeLabel(AppStrings s, ThemeMode mode) {
   switch (mode) {
     case ThemeMode.system:
-      return 'System';
+      return s.themeSystem;
     case ThemeMode.light:
-      return 'Light';
+      return s.themeLight;
     case ThemeMode.dark:
-      return 'Dark';
+      return s.themeDark;
   }
 }

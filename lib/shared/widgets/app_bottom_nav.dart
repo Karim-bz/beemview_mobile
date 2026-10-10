@@ -1,23 +1,32 @@
 import 'package:flutter/material.dart';
 
 import '../../core/colors.dart';
+import '../../l10n/app_strings.dart';
 
 class NavTab {
-  const NavTab(this.label, this.icon, this.activeIcon);
-  final String label;
+  NavTab(this.labelOf, this.icon, this.activeIcon);
+  final String Function(AppStrings) labelOf;
   final IconData icon;
   final IconData activeIcon;
 }
 
-const kNavTabs = [
-  NavTab('Projects', Icons.folder_outlined, Icons.folder_rounded),
-  NavTab('Tasks', Icons.check_box_outlined, Icons.check_box_rounded),
+final kNavTabs = [
+  NavTab((s) => s.navProjects, Icons.folder_outlined, Icons.folder_rounded),
   NavTab(
-    'Notifications',
+    (s) => s.navTasks,
+    Icons.check_box_outlined,
+    Icons.check_box_rounded,
+  ),
+  NavTab(
+    (s) => s.navNotifications,
     Icons.notifications_none_rounded,
     Icons.notifications_rounded,
   ),
-  NavTab('Profile', Icons.person_outline_rounded, Icons.person_rounded),
+  NavTab(
+    (s) => s.navProfile,
+    Icons.person_outline_rounded,
+    Icons.person_rounded,
+  ),
 ];
 
 /// Bottom navigation with a tinted pill behind the active icon.
@@ -109,9 +118,9 @@ class _NavItem extends StatelessWidget {
                   color: color,
                 ),
                 if (dot)
-                  Positioned(
+                  PositionedDirectional(
                     top: 5,
-                    right: 15,
+                    end: 15,
                     child: Container(
                       width: 8,
                       height: 8,
@@ -127,7 +136,7 @@ class _NavItem extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            tab.label,
+            tab.labelOf(context.l10n),
             maxLines: 1,
             style: TextStyle(
               fontSize: 10.5,

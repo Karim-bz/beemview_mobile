@@ -7,6 +7,7 @@ import '../../../data/models/task.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/initials_avatar.dart';
 import '../../../shared/widgets/status_pill.dart';
+import '../../../l10n/app_strings.dart';
 
 class ProjectOverview extends StatefulWidget {
   const ProjectOverview({
@@ -133,7 +134,7 @@ class ProjectOverviewState extends State<ProjectOverview> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'PROJECT',
+                      context.l10n.projectLabel,
                       style: TextStyle(
                         fontSize: 10.5,
                         letterSpacing: 0.8,
@@ -215,7 +216,7 @@ class ProjectOverviewState extends State<ProjectOverview> {
                   if (nextDueDate != null) ...[
                     _InfoRow(
                       icon: Icons.event_outlined,
-                      label: 'Next deadline',
+                      label: context.l10n.nextDeadline,
                       value: _formatProjectDate(nextDueDate),
                       valueColor: (daysUntil(nextDueDate) ?? 0) < 0
                           ? AppColors.danger
@@ -224,9 +225,9 @@ class ProjectOverviewState extends State<ProjectOverview> {
                     if (nextDueTaskName != null) ...[
                       const SizedBox(height: 4),
                       Align(
-                        alignment: Alignment.centerLeft,
+                        alignment: AlignmentDirectional.centerStart,
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 30),
+                          padding: const EdgeInsetsDirectional.only(start: 30),
                           child: Text(
                             nextDueTaskName,
                             maxLines: 1,
@@ -250,9 +251,9 @@ class ProjectOverviewState extends State<ProjectOverview> {
                   if (priorities.isNotEmpty)
                     _InfoRow(
                       icon: Icons.flag_outlined,
-                      label: 'Priority',
+                      label: context.l10n.priority,
                       value: priorities.entries
-                          .map((e) => '${e.key} ${e.value}')
+                          .map((e) => '${context.l10n.priorityLabel(e.key)} ${e.value}')
                           .join(' • '),
                       maxLines: 3,
                     ),
@@ -271,7 +272,7 @@ class ProjectOverviewState extends State<ProjectOverview> {
                         ),
                         const SizedBox(width: 10),
                         Text(
-                          'Assignees',
+                          context.l10n.assignees,
                           style: TextStyle(
                             fontSize: 12,
                             color: context.palette.muted,
@@ -301,19 +302,19 @@ class ProjectOverviewState extends State<ProjectOverview> {
     final difference = target.difference(today).inDays;
 
     if (difference == 0) {
-      return 'Today';
+      return context.l10n.today;
     }
 
     if (difference == 1) {
-      return 'Tomorrow';
+      return context.l10n.tomorrow;
     }
 
     if (difference == -1) {
-      return 'Yesterday';
+      return context.l10n.yesterday;
     }
 
     if (difference < 0) {
-      return '${difference.abs()} days overdue';
+      return context.l10n.daysOverdue(difference.abs());
     }
 
     return '${date.day.toString().padLeft(2, '0')}/'
@@ -357,7 +358,7 @@ class _InfoRow extends StatelessWidget {
             value,
             maxLines: maxLines,
             overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.right,
+            textAlign: TextAlign.end,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w700,

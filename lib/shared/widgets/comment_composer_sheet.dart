@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/colors.dart';
 import 'status_picker_sheet.dart' show SheetHandle;
+import '../../l10n/app_strings.dart';
 
 const int kMaxCommentLength = 500;
 
@@ -60,8 +61,8 @@ class _CommentComposerSheetState extends State<_CommentComposerSheet> {
             children: [
               const SheetHandle(),
               const SizedBox(height: 16),
-              const Text(
-                'Add a comment',
+              Text(
+                context.l10n.addComment,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 14),
@@ -81,7 +82,7 @@ class _CommentComposerSheetState extends State<_CommentComposerSheet> {
                 textInputAction: TextInputAction.newline,
                 style: const TextStyle(fontSize: 15, height: 1.4),
                 decoration: InputDecoration(
-                  hintText: 'Write your comment...',
+                  hintText: context.l10n.writeCommentHint,
                   hintStyle: TextStyle(
                     fontSize: 15,
                     color: context.palette.hint,
@@ -104,7 +105,7 @@ class _CommentComposerSheetState extends State<_CommentComposerSheet> {
               ),
               const SizedBox(height: 6),
               Align(
-                alignment: Alignment.centerRight,
+                alignment: AlignmentDirectional.centerEnd,
                 child: Text(
                   '${_controller.text.length} / $kMaxCommentLength',
                   style: TextStyle(
@@ -131,8 +132,8 @@ class _CommentComposerSheetState extends State<_CommentComposerSheet> {
                             borderRadius: BorderRadius.circular(AppRadius.m),
                           ),
                         ),
-                        child: const Text(
-                          'Cancel',
+                        child: Text(
+                          context.l10n.cancel,
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 15,
@@ -145,7 +146,7 @@ class _CommentComposerSheetState extends State<_CommentComposerSheet> {
                   Expanded(
                     flex: 6,
                     child: GradientButton(
-                      label: 'Send',
+                      label: context.l10n.send,
                       icon: Icons.send_rounded,
                       onPressed: canSend ? _submit : null,
                     ),

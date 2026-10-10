@@ -25,7 +25,7 @@ class AuthRepository {
     final body = res.data ?? {};
     final token = body['token'] as String?;
     if (token == null || token.isEmpty) {
-      throw ApiException('Login response did not include a token.');
+      throw ApiException(_api.strings.loginNoToken);
     }
     await _storage.saveToken(token);
 

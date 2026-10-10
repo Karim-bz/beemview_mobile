@@ -19,6 +19,7 @@ A small Flutter app to browse projects, view their tasks, and update a task's st
 - **Project tasks**: list of a project's tasks, with a name search and a status filter. Both work on the tasks already loaded.
 - **Task details**: description, project, assignees, dates, status, priority and the latest comment.
 - **Update status**: pick a new status and add an optional note. The note is sent as a separate comment.
+- **Languages**: English and Arabic (with right-to-left layout). Follows the phone language by default. Change it in Profile → Language.
 - **Dark mode**: follows the phone setting by default. You can choose System, Light or Dark in Profile → Appearance.
 
 ---
@@ -84,6 +85,23 @@ Widgets read them with `context.palette.surface`, `context.palette.ink`, and so 
 Brand colors (`AppColors.teal`, `orange`, `green`, `danger`) are the same in both themes.
 `ThemeProvider` keeps the user's choice and saves it with `shared_preferences`.
 
+### Languages (English and Arabic)
+
+All texts are in one file, `lib/l10n/app_strings.dart`: an `AppStrings` class with an English and an Arabic version.
+Widgets read them with `context.l10n.retry`. If a text is missing in one language, the code does not compile.
+Code without a `BuildContext` (like the API client) gets the current language from `LocaleProvider`.
+
+- Arabic uses right-to-left layout automatically. Padding and alignment use `start` / `end` instead of `left` / `right`.
+- Arabic uses the Cairo font (the English font has no Arabic letters).
+- Numbers and dates use western digits (1, 2, 3) in both languages.
+- Arabic counting follows the Arabic rules (1, 2, 3 to 10, 11 and more) for words like "tasks" and "days".
+
+**API language.** Every request sends `Accept-Language`: `en` for English, and `ar` for Arabic
+(Arabic first, English as fallback). The app never depends on the wording of server messages.
+If the server does not translate its messages, they stay in English, while the app's own messages are in Arabic.
+
+To add a text: add it to the abstract class and to both languages in `app_strings.dart`.
+
 ### Cleaning up the API data
 
 The API is not consistent between the task list and task details, so the models fix it:
@@ -116,16 +134,17 @@ While a save is running, the buttons are disabled to stop double submits.
 
 ## Packages
 
-| Package                  | Used for                            |
-| ------------------------ | ----------------------------------- |
-| `provider`               | State management                    |
-| `dio`                    | API requests                        |
-| `flutter_secure_storage` | Saving the login token safely       |
-| `connectivity_plus`      | Offline banner                      |
-| `intl`                   | Date formatting                     |
-| `google_fonts`           | App fonts (downloaded on first use) |
-| `shared_preferences`     | Remembering the theme choice        |
-| `mocktail` (dev)         | Mocks in tests                      |
+| Package                  | Used for                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| `provider`               | State management                                                                |
+| `dio`                    | API requests                                                                    |
+| `flutter_secure_storage` | Saving the login token safely                                                   |
+| `connectivity_plus`      | Offline banner                                                                  |
+| `intl`                   | Date formatting                                                                 |
+| `google_fonts`           | App fonts (downloaded on first use)                                             |
+| `shared_preferences`     | Remembering the theme choice                                                    |
+| `flutter_localizations`  | Arabic for Flutter's own texts (date picker, copy/paste menu) and right-to-left |
+| `mocktail` (dev)         | Mocks in tests                                                                  |
 
 ---
 

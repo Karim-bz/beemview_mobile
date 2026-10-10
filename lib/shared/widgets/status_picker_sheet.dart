@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/colors.dart';
 import '../../core/status_labels.dart';
+import '../../l10n/app_strings.dart';
 
 /// Status values that can be selected from the details screen.
 const kSelectableTaskStatuses = <String>[
@@ -34,10 +35,10 @@ Future<String?> showStatusPicker(
             const SizedBox(height: 10),
             const SheetHandle(),
             const SizedBox(height: 16),
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                'Change status',
+                context.l10n.changeStatus,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
               ),
             ),
@@ -117,7 +118,7 @@ class _StatusOptionTile extends StatelessWidget {
                 const SizedBox(width: 14),
                 Expanded(
                   child: Text(
-                    StatusLabels.label(status),
+                    StatusLabels.label(context.l10n, status),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w600,

@@ -15,6 +15,7 @@ import 'new_task_screen.dart';
 import 'project_tasks_provider.dart';
 import '../task_details/task_details_screen.dart';
 import 'widgets/project_overview.dart';
+import '../../l10n/app_strings.dart';
 
 const _taskStatuses = <String>[
   'to_do',
@@ -30,14 +31,22 @@ const _taskStatuses = <String>[
 /// Date buckets, in display order.
 enum _Bucket { overdue, today, thisWeek, later, earlier, noDate }
 
-const _bucketTitles = {
-  _Bucket.overdue: 'Overdue',
-  _Bucket.today: 'Today',
-  _Bucket.thisWeek: 'This week',
-  _Bucket.later: 'Later',
-  _Bucket.earlier: 'Earlier',
-  _Bucket.noDate: 'No due date',
-};
+String _bucketTitle(AppStrings s, _Bucket bucket) {
+  switch (bucket) {
+    case _Bucket.overdue:
+      return s.overdue;
+    case _Bucket.today:
+      return s.today;
+    case _Bucket.thisWeek:
+      return s.thisWeek;
+    case _Bucket.later:
+      return s.later;
+    case _Bucket.earlier:
+      return s.earlier;
+    case _Bucket.noDate:
+      return s.noDueDate;
+  }
+}
 
 _Bucket _bucketOf(Task t) {
   final days = daysUntil(t.dueDate);
@@ -102,12 +111,12 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
   }
 
   String _subtitle(List<Task> all) {
-    if (all.isEmpty) return 'No tasks yet';
+    if (all.isEmpty) return context.l10n.noTasksYet;
     final dueToday = all
         .where((t) => daysUntil(t.dueDate) == 0 && !isClosedStatus(t.status))
         .length;
-    final base = '${all.length} task${all.length == 1 ? '' : 's'}';
-    return dueToday > 0 ? '$base · $dueToday due today' : base;
+    final base = context.l10n.taskCount(all.length);
+    return dueToday > 0 ? '$base · ${context.l10n.dueTodayCount(dueToday)}' : base;
   }
 
   Future<void> _openNewTask() async {
@@ -124,7 +133,7 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
       context.read<ProjectsProvider>().refreshSilently();
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('Task created')));
+        ..showSnackBar(SnackBar(content: Text(context.l10n.taskCreated)));
     }
   }
 
@@ -183,11 +192,11 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
     return Column(
       children: [
         Align(
-          alignment: Alignment.centerLeft,
+          alignment: AlignmentDirectional.centerStart,
           child: Padding(
-            padding: EdgeInsets.only(left: 2, bottom: 8),
+            padding: EdgeInsetsDirectional.only(start: 2, bottom: 8),
             child: Text(
-              'Filtering the tasks already loaded for this project',
+              context.l10n.filterCaption,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
@@ -198,7 +207,7 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
         ),
         SearchField(
           controller: _searchController,
-          hint: 'Filter loaded tasks by name...',
+          hint: context.l10n.filterHint,
         ),
         const SizedBox(height: 14),
         _buildFilterChips(all),
@@ -228,7 +237,7 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
         itemBuilder: (context, index) {
           final status = options[index];
           return FilterPill(
-            label: status == null ? 'All' : StatusLabels.shortLabel(status),
+            label: status == null ? context.l10n.all : StatusLabels.shortLabel(context.l10n, status),
             count: counts[status] ?? 0,
             selected: _statusFilter == status,
             dotColor: status == null ? null : StatusLabels.color(status),
@@ -261,14 +270,14 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
         return scroll([
           header,
           const SizedBox(height: 60),
-          const LoadingView(message: 'Loading tasks...'),
+          LoadingView(message: context.l10n.loadingTasks),
         ]);
       case TasksStatus.error:
         return scroll([
           header,
           const SizedBox(height: 40),
           ErrorView(
-            message: provider.error ?? 'Failed to load tasks.',
+            message: provider.error ?? context.l10n.failedLoadTasks,
             onRetry: _refresh,
           ),
         ]);
@@ -277,8 +286,8 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
           return scroll([
             header,
             const SizedBox(height: 40),
-            const EmptyView(
-              message: 'This project has no tasks yet.',
+            EmptyView(
+              message: context.l10n.projectNoTasks,
               icon: Icons.checklist_rounded,
             ),
           ]);
@@ -290,8 +299,8 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
           _searchAndChips(provider.tasks),
           if (filtered.isEmpty) ...[
             const SizedBox(height: 40),
-            const EmptyView(
-              message: 'No tasks match your filters.',
+            EmptyView(
+              message: context.l10n.noTasksMatch,
               icon: Icons.search_off_rounded,
             ),
           ] else
@@ -320,9 +329,9 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
       if (list == null || list.isEmpty) continue;
       children.add(
         Padding(
-          padding: const EdgeInsets.fromLTRB(4, 14, 0, 10),
+          padding: const EdgeInsetsDirectional.fromSTEB(4, 14, 0, 10),
           child: Text(
-            _bucketTitles[bucket]!,
+            _bucketTitle(context.l10n, bucket),
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,

@@ -7,6 +7,7 @@ import '../../shared/widgets/beemview_wordmark.dart';
 import '../shell/main_shell.dart';
 import 'auth_provider.dart';
 import 'login_screen.dart';
+import '../../l10n/app_strings.dart';
 
 /// Decides which screen to show based on auth status.
 class SessionGate extends StatelessWidget {
@@ -27,7 +28,7 @@ class SessionGate extends StatelessWidget {
         return SessionRetryView(
           message:
               context.read<AuthProvider>().error ??
-              'Could not verify your session.',
+              context.l10n.sessionVerifyFailed,
           onRetry: () => context.read<AuthProvider>().restoreSession(),
           onSignOut: () => context.read<AuthProvider>().logout(),
         );
@@ -118,9 +119,9 @@ class SessionRetryView extends StatelessWidget {
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.teal,
                   ),
-                  child: const Text('Retry'),
+                  child: Text(context.l10n.retry),
                 ),
-                TextButton(onPressed: onSignOut, child: const Text('Sign out')),
+                TextButton(onPressed: onSignOut, child: Text(context.l10n.signOut)),
               ],
             ),
           ),

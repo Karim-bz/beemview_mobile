@@ -10,6 +10,7 @@ import '../auth/auth_provider.dart';
 import '../projects/projects_provider.dart';
 import '../shell/main_shell.dart';
 import '../task_details/task_details_screen.dart';
+import '../../l10n/app_strings.dart';
 
 /// "My tasks" tab: open tasks assigned to the signed-in user.
 class TasksScreen extends StatelessWidget {
@@ -33,8 +34,8 @@ class TasksScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Tasks',
+                  Text(
+                    context.l10n.navTasks,
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w800,
@@ -43,7 +44,7 @@ class TasksScreen extends StatelessWidget {
                   ),
                   if (tasks.isNotEmpty)
                     Text(
-                      '${tasks.length} open · ${_dueTodayCount(tasks)} due today',
+                      '${context.l10n.openCount(tasks.length)} · ${context.l10n.dueTodayCount(_dueTodayCount(tasks))}',
                       style: TextStyle(
                         fontSize: 13,
                         color: context.palette.muted,
@@ -67,10 +68,10 @@ class TasksScreen extends StatelessWidget {
     switch (p.status) {
       case ProjectsStatus.idle:
       case ProjectsStatus.loading:
-        return const LoadingView(message: 'Loading tasks...');
+        return LoadingView(message: context.l10n.loadingTasks);
       case ProjectsStatus.error:
         return ErrorView(
-          message: p.error ?? 'Failed to load tasks.',
+          message: p.error ?? context.l10n.failedLoadTasks,
           onRetry: () => p.load(),
         );
       case ProjectsStatus.loaded:
@@ -94,28 +95,28 @@ class _TaskList extends StatelessWidget {
     for (final t in tasks) {
       final d = daysUntil(t.dueDate);
       final key = d == null
-          ? 'No due date'
+          ? context.l10n.noDueDate
           : d < 0
-          ? 'Overdue'
+          ? context.l10n.overdue
           : d == 0
-          ? 'Today'
-          : 'Upcoming';
+          ? context.l10n.today
+          : context.l10n.upcoming;
       groups.putIfAbsent(key, () => []).add(t);
     }
 
     final children = <Widget>[];
-    for (final key in const ['Overdue', 'Today', 'Upcoming', 'No due date']) {
+    for (final key in [context.l10n.overdue, context.l10n.today, context.l10n.upcoming, context.l10n.noDueDate]) {
       final list = groups[key];
       if (list == null) continue;
       children.add(
         Padding(
-          padding: const EdgeInsets.fromLTRB(4, 16, 0, 10),
+          padding: const EdgeInsetsDirectional.fromSTEB(4, 16, 0, 10),
           child: Text(
             key,
             style: TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
-              color: key == 'Overdue' ? AppColors.danger : context.palette.muted,
+              color: key == context.l10n.overdue ? AppColors.danger : context.palette.muted,
             ),
           ),
         ),
@@ -158,14 +159,13 @@ class _EmptyTasks extends StatelessWidget {
           children: [
             const _ChecklistIllustration(),
             const SizedBox(height: 24),
-            const Text(
-              'Nothing on your plate',
+            Text(
+              context.l10n.nothingOnPlate,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
             Text(
-              'Tasks assigned to you will show up here.\n'
-              'Pick a project to get started.',
+              context.l10n.tasksEmptyHint,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
@@ -188,8 +188,8 @@ class _EmptyTasks extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadius.m),
                 ),
               ),
-              child: const Text(
-                'Browse projects',
+              child: Text(
+                context.l10n.browseProjects,
                 style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
               ),
             ),

@@ -21,6 +21,7 @@ import 'widgets/task_assignee_chip.dart';
 import 'widgets/task_comment_bar.dart';
 import 'widgets/task_comment_tile.dart';
 import 'widgets/task_info_tile.dart';
+import '../../l10n/app_strings.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
   const TaskDetailsScreen({super.key, required this.taskId, this.initialTask});
@@ -61,7 +62,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final outcome = await context.read<TaskDetailsProvider>().updateStatus(
       status: request.status,
       note: request.note,
-      authorName: author,
+      authorName: author ?? context.l10n.you,
     );
 
     if (!mounted) return;
@@ -90,7 +91,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final author = context.read<AuthProvider>().user?.fullName;
     final outcome = await context.read<TaskDetailsProvider>().addComment(
       content: text,
-      authorName: author,
+      authorName: author ?? context.l10n.you,
     );
 
     if (!mounted) return;
@@ -102,7 +103,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final author = context.read<AuthProvider>().user?.fullName;
     final outcome = await context
         .read<TaskDetailsProvider>()
-        .retryPendingComment(authorName: author);
+        .retryPendingComment(authorName: author ?? context.l10n.you);
     if (!mounted) return;
     _handleOutcome(outcome, isRetry: true);
   }
@@ -110,22 +111,22 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   void _comingSoon(String what) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$what — coming soon')));
+      ..showSnackBar(SnackBar(content: Text(context.l10n.comingSoon(what))));
   }
 
   void _handleOutcome(SubmitOutcome outcome, {bool isRetry = false}) {
     final messenger = ScaffoldMessenger.of(context);
     switch (outcome) {
       case SubmitOutcome.fullSuccess:
-        messenger.showSnackBar(const SnackBar(content: Text('Saved')));
+        messenger.showSnackBar(SnackBar(content: Text(context.l10n.saved)));
         break;
       case SubmitOutcome.partialSuccess:
         messenger.showSnackBar(
           SnackBar(
             content: Text(
               isRetry
-                  ? 'The note could not be sent yet.'
-                  : 'Status saved, but the note failed to send.',
+                  ? context.l10n.noteNotSentYet
+                  : context.l10n.statusSavedNoteFailed,
             ),
             duration: const Duration(seconds: 4),
           ),
@@ -134,7 +135,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       case SubmitOutcome.failure:
         final msg =
             context.read<TaskDetailsProvider>().lastSubmitError ??
-            'Something went wrong.';
+            context.l10n.somethingWentWrong;
         messenger.showSnackBar(SnackBar(content: Text(msg)));
         break;
       case SubmitOutcome.ignored:
@@ -156,11 +157,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
               child: Row(
-                children: const [
+                children: [
                   SquareBackButton(),
                   SizedBox(width: 14),
                   Text(
-                    'Task details',
+                    context.l10n.taskDetails,
                     style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
                   ),
                 ],
@@ -182,16 +183,16 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     switch (provider.status) {
       case DetailsStatus.idle:
       case DetailsStatus.loading:
-        return const LoadingView(message: 'Loading task...');
+        return LoadingView(message: context.l10n.loadingTask);
       case DetailsStatus.error:
         return ErrorView(
-          message: provider.error ?? 'Failed to load task.',
+          message: provider.error ?? context.l10n.failedLoadTask,
           onRetry: provider.reload,
         );
       case DetailsStatus.loaded:
         final task = provider.task;
         if (task == null) {
-          return const EmptyView(message: 'Task not found.');
+          return EmptyView(message: context.l10n.taskNotFound);
         }
         return _buildContent(provider, task);
     }
@@ -205,10 +206,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final overdue = days < 0;
     final color = overdue ? AppColors.danger : AppColors.orange;
     final text = overdue
-        ? '${-days} day${days == -1 ? '' : 's'} overdue'
+        ? context.l10n.daysOverdue(-days)
         : days == 0
-        ? 'Due today'
-        : '$days day${days == 1 ? '' : 's'} left';
+        ? context.l10n.dueToday
+        : context.l10n.daysLeft(days);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -275,7 +276,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            hasDescription ? task.description! : 'No description provided.',
+            hasDescription ? task.description! : context.l10n.noDescription,
             style: TextStyle(
               fontSize: 14,
               height: 1.5,
@@ -292,7 +293,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 child: InfoTile(
                   icon: Icons.folder_outlined,
                   color: AppColors.teal,
-                  label: 'Project',
+                  label: context.l10n.project,
                   value: task.project?.name ?? '—',
                 ),
               ),
@@ -301,10 +302,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 child: InfoTile(
                   icon: Icons.outlined_flag_rounded,
                   color: PriorityPill.colorFor(task.priority),
-                  label: 'Priority',
+                  label: context.l10n.priority,
                   value: task.priority == null
                       ? '—'
-                      : PriorityPill.labelFor(task.priority!),
+                      : PriorityPill.labelFor(context.l10n, task.priority!),
                 ),
               ),
             ],
@@ -316,8 +317,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 child: InfoTile(
                   icon: Icons.calendar_today_outlined,
                   color: const Color(0xFF7B61FF),
-                  label: 'Start',
-                  value: fmtDate(task.startDate),
+                  label: context.l10n.start,
+                  value: fmtDate(context.l10n, task.startDate),
                 ),
               ),
               const SizedBox(width: 12),
@@ -325,8 +326,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 child: InfoTile(
                   icon: Icons.schedule_rounded,
                   color: AppColors.orange,
-                  label: 'Due',
-                  value: fmtDate(task.dueDate),
+                  label: context.l10n.due,
+                  value: fmtDate(context.l10n, task.dueDate),
                 ),
               ),
             ],
@@ -340,7 +341,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
-                'Assignees',
+                context.l10n.assignees,
                 style: TextStyle(
                   fontSize: 13,
                   color: context.palette.muted,
@@ -348,7 +349,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 ),
               ),
               for (final a in task.assignees) AssigneeChip(name: a.fullName),
-              AssignButton(onTap: () => _comingSoon('Assigning people')),
+              AssignButton(onTap: () => _comingSoon(context.l10n.assigningPeople)),
             ],
           ),
           const SizedBox(height: 22),
@@ -357,7 +358,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           Row(
             children: [
               Text(
-                'Comments',
+                context.l10n.comments,
                 style: TextStyle(
                   fontSize: 13,
                   color: context.palette.muted,
@@ -381,7 +382,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Text(
-                'No comments yet.',
+                context.l10n.noCommentsYet,
                 style: TextStyle(fontSize: 13.5, color: context.palette.hint),
               ),
             )

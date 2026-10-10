@@ -16,6 +16,7 @@ import '../../shared/widgets/status_picker_sheet.dart' show SheetHandle;
 import '../auth/auth_provider.dart';
 import '../task_details/widgets/task_assign_button.dart';
 import 'project_tasks_provider.dart';
+import '../../l10n/app_strings.dart';
 
 /// Statuses a task can be created with, in display order.
 const _creatableStatuses = <String>['to_do', 'in_progress', 'on_hold'];
@@ -90,8 +91,8 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
 
   String? _validateName(String? v) {
     final value = v?.trim() ?? '';
-    if (value.isEmpty) return 'Task name is required';
-    if (value.length < 3) return 'Name must be at least 3 characters';
+    if (value.isEmpty) return context.l10n.taskNameRequired;
+    if (value.length < 3) return context.l10n.nameTooShort;
     return null;
   }
 
@@ -142,7 +143,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       initialDate: current ?? _startDate ?? dateOnly(DateTime.now()),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      helpText: isStart ? 'Start date' : 'Due date',
+      helpText: isStart ? context.l10n.startDate : context.l10n.dueDate,
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: Theme.of(context).colorScheme
@@ -230,8 +231,8 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'New task',
+                        Text(
+                          context.l10n.newTask,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w800,
@@ -271,7 +272,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           FormErrorBanner(message: _errorMessage!),
                           const SizedBox(height: 16),
                         ],
-                        const FormLabel('Task name'),
+                        FormLabel(context.l10n.taskName),
                         InputCard(
                           focused: _nameFocus.hasFocus,
                           child: TextFormField(
@@ -284,7 +285,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                             textInputAction: TextInputAction.next,
                             style: kInputStyle,
                             decoration: formInputDecoration(
-                              hint: 'e.g. Create employee module',
+                              hint: context.l10n.taskNameHint,
                               icon: Icons.task_alt_rounded,
                               focused: _nameFocus.hasFocus,
                               context: context,
@@ -292,14 +293,14 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           ),
                         ),
                         const SizedBox(height: 18),
-                        const FormLabel('Status'),
+                        FormLabel(context.l10n.status),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
                           children: [
                             for (final s in _creatableStatuses)
                               ChoicePill(
-                                label: StatusLabels.label(s),
+                                label: StatusLabels.label(context.l10n, s),
                                 color: StatusLabels.color(s),
                                 selected: s == _status,
                                 onTap: _submitting
@@ -309,14 +310,14 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           ],
                         ),
                         const SizedBox(height: 18),
-                        const FormLabel('Priority'),
+                        FormLabel(context.l10n.priority),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
                           children: [
                             for (final p in _priorities)
                               ChoicePill(
-                                label: PriorityPill.labelFor(p),
+                                label: PriorityPill.labelFor(context.l10n, p),
                                 color: PriorityPill.colorFor(p),
                                 icon: Icons.outlined_flag_rounded,
                                 selected: p == _priority,
@@ -327,12 +328,12 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           ],
                         ),
                         const SizedBox(height: 18),
-                        const FormLabel('Timeline'),
+                        FormLabel(context.l10n.timeline),
                         Row(
                           children: [
                             Expanded(
                               child: DateTile(
-                                label: 'Start',
+                                label: context.l10n.start,
                                 date: _startDate,
                                 onTap: _submitting
                                     ? null
@@ -345,7 +346,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: DateTile(
-                                label: 'Due',
+                                label: context.l10n.due,
                                 date: _dueDate,
                                 error: !_datesValid,
                                 onTap: _submitting
@@ -359,12 +360,12 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           ],
                         ),
                         if (!_datesValid)
-                          const FormFieldError('Due date must be after start'),
+                          FormFieldError(context.l10n.dueAfterStart),
                         const SizedBox(height: 18),
-                        const FormLabel('Assignees'),
+                        FormLabel(context.l10n.assignees),
                         _assigneesSection(),
                         const SizedBox(height: 18),
-                        const FormLabel('Description (optional)'),
+                        FormLabel(context.l10n.descriptionOptional),
                         InputCard(
                           focused: _descriptionFocus.hasFocus,
                           child: TextFormField(
@@ -378,7 +379,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                             keyboardType: TextInputType.multiline,
                             style: kInputStyle.copyWith(height: 1.4),
                             decoration: formInputDecoration(
-                              hint: 'What needs to be done?',
+                              hint: context.l10n.taskDescriptionHint,
                               focused: _descriptionFocus.hasFocus,
                               padding: const EdgeInsets.all(16),
                               context: context,
@@ -386,9 +387,12 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           ),
                         ),
                         Align(
-                          alignment: Alignment.centerRight,
+                          alignment: AlignmentDirectional.centerEnd,
                           child: Padding(
-                            padding: const EdgeInsets.only(top: 6, right: 4),
+                            padding: const EdgeInsetsDirectional.only(
+                              top: 6,
+                              end: 4,
+                            ),
                             child: Text(
                               '${_descriptionController.text.length} / $_maxDescriptionLength',
                               style: TextStyle(
@@ -421,7 +425,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                       ),
                     )
                   : GradientButton(
-                      label: 'Create task',
+                      label: context.l10n.createTask,
                       icon: Icons.check_rounded,
                       onPressed: _submit,
                     ),
@@ -463,9 +467,9 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
             color: _isPrivate ? AppColors.teal : context.palette.muted,
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Text(
-              'Private task',
+              context.l10n.privateTask,
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
           ),
@@ -494,7 +498,7 @@ class _RemovableAssignee extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(5, 5, 6, 5),
+      padding: const EdgeInsetsDirectional.fromSTEB(5, 5, 6, 5),
       decoration: BoxDecoration(
         color: context.palette.surface,
         borderRadius: BorderRadius.circular(20),
@@ -555,10 +559,10 @@ class _AssigneePickerSheetState extends State<_AssigneePickerSheet> {
           const SizedBox(height: 10),
           const SheetHandle(),
           const SizedBox(height: 16),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              'Assign people',
+              context.l10n.assignPeople,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
             ),
           ),
@@ -582,8 +586,8 @@ class _AssigneePickerSheetState extends State<_AssigneePickerSheet> {
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
             child: GradientButton(
               label: _selected.isEmpty
-                  ? 'Done'
-                  : 'Done (${_selected.length} selected)',
+                  ? context.l10n.doneButton
+                  : context.l10n.doneSelected(_selected.length),
               onPressed: () => Navigator.of(context).pop([
                 for (final a in widget.candidates)
                   if (_selected.contains(a.id)) a,

@@ -12,6 +12,7 @@ import '../../shared/widgets/comment_composer_sheet.dart' show GradientButton;
 import '../../shared/widgets/form_parts.dart';
 import '../../shared/widgets/status_picker_sheet.dart' show SheetHandle;
 import 'projects_provider.dart';
+import '../../l10n/app_strings.dart';
 
 /// Statuses a project can be created with, in display order.
 const _creatableStatuses = <String>[
@@ -88,15 +89,15 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
 
   String? _validateName(String? v) {
     final value = v?.trim() ?? '';
-    if (value.isEmpty) return 'Project name is required';
-    if (value.length < 3) return 'Name must be at least 3 characters';
+    if (value.isEmpty) return context.l10n.projectNameRequired;
+    if (value.length < 3) return context.l10n.nameTooShort;
     return null;
   }
 
   String? _validateUnitId(String? v) {
     final value = v?.trim() ?? '';
-    if (value.isEmpty) return 'Organizational unit ID is required';
-    if (int.tryParse(value) == null) return 'Enter a valid number';
+    if (value.isEmpty) return context.l10n.unitIdRequired;
+    if (int.tryParse(value) == null) return context.l10n.validNumber;
     return null;
   }
 
@@ -129,7 +130,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
       initialDate: initial,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      helpText: isStart ? 'Start date' : 'End date',
+      helpText: isStart ? context.l10n.startDate : context.l10n.endDate,
       builder: (context, child) => Theme(
         data: Theme.of(context).copyWith(
           colorScheme: Theme.of(context).colorScheme
@@ -218,9 +219,9 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                     },
                   ),
                   const SizedBox(width: 14),
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'New project',
+                      context.l10n.newProject,
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w800,
@@ -248,7 +249,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                           FormErrorBanner(message: _errorMessage!),
                           const SizedBox(height: 16),
                         ],
-                        const FormLabel('Project name'),
+                        FormLabel(context.l10n.projectName),
                         InputCard(
                           focused: _nameFocus.hasFocus,
                           child: TextFormField(
@@ -261,7 +262,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                             textInputAction: TextInputAction.next,
                             style: _inputStyle,
                             decoration: _decoration(
-                              hint: 'e.g. Website redesign',
+                              hint: context.l10n.projectNameHint,
                               icon: Icons.folder_outlined,
                               focused: _nameFocus.hasFocus,
                               hideCounter: true,
@@ -269,18 +270,18 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                           ),
                         ),
                         const SizedBox(height: 18),
-                        const FormLabel('Organizational unit'),
+                        FormLabel(context.l10n.organizationalUnit),
                         _unitField(units),
                         const SizedBox(height: 18),
-                        const FormLabel('Status'),
+                        FormLabel(context.l10n.status),
                         _statusChips(),
                         const SizedBox(height: 18),
-                        const FormLabel('Timeline'),
+                        FormLabel(context.l10n.timeline),
                         Row(
                           children: [
                             Expanded(
                               child: DateTile(
-                                label: 'Start',
+                                label: context.l10n.start,
                                 date: _startDate,
                                 onTap: _submitting
                                     ? null
@@ -290,7 +291,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                             const SizedBox(width: 12),
                             Expanded(
                               child: DateTile(
-                                label: 'End',
+                                label: context.l10n.end,
                                 date: _endDate,
                                 error: !_datesValid,
                                 onTap: _submitting
@@ -301,9 +302,9 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                           ],
                         ),
                         if (!_datesValid)
-                          const FormFieldError('End date must be after start'),
+                          FormFieldError(context.l10n.endAfterStart),
                         const SizedBox(height: 18),
-                        const FormLabel('Description (optional)'),
+                        FormLabel(context.l10n.descriptionOptional),
                         InputCard(
                           focused: _descriptionFocus.hasFocus,
                           child: TextFormField(
@@ -317,7 +318,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                             keyboardType: TextInputType.multiline,
                             style: _inputStyle.copyWith(height: 1.4),
                             decoration: _decoration(
-                              hint: 'What is this project about?',
+                              hint: context.l10n.projectDescriptionHint,
                               focused: _descriptionFocus.hasFocus,
                               hideCounter: true,
                               padding: const EdgeInsets.all(16),
@@ -325,9 +326,9 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                           ),
                         ),
                         Align(
-                          alignment: Alignment.centerRight,
+                          alignment: AlignmentDirectional.centerEnd,
                           child: Padding(
-                            padding: const EdgeInsets.only(top: 6, right: 4),
+                            padding: const EdgeInsetsDirectional.only(top: 6, end: 4),
                             child: Text(
                               '${_descriptionController.text.length} / $_maxDescriptionLength',
                               style: TextStyle(
@@ -358,7 +359,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
                       ),
                     )
                   : GradientButton(
-                      label: 'Create project',
+                      label: context.l10n.createProject,
                       icon: Icons.check_rounded,
                       onPressed: () => _submit(hasKnownUnits: hasUnits),
                     ),
@@ -423,7 +424,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
           keyboardType: TextInputType.number,
           style: _inputStyle,
           decoration: _decoration(
-            hint: 'Unit ID (e.g. 71)',
+            hint: context.l10n.unitIdHint,
             icon: Icons.apartment_rounded,
             focused: _unitIdFocus.hasFocus,
           ),
@@ -448,7 +449,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  unit?.name ?? 'Select a unit',
+                  unit?.name ?? context.l10n.selectUnit,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -465,7 +466,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
             ],
           ),
         ),
-        if (_unitError) const FormFieldError('Select an organizational unit'),
+        if (_unitError) FormFieldError(context.l10n.selectUnitError),
       ],
     );
   }
@@ -525,7 +526,7 @@ class _StatusChip extends StatelessWidget {
             ),
             const SizedBox(width: 7),
             Text(
-              StatusLabels.label(status),
+              StatusLabels.label(context.l10n, status),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -556,10 +557,10 @@ class _UnitPickerSheet extends StatelessWidget {
           const SizedBox(height: 10),
           const SheetHandle(),
           const SizedBox(height: 16),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              'Organizational unit',
+              context.l10n.organizationalUnit,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
             ),
           ),
