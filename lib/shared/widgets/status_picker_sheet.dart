@@ -65,7 +65,7 @@ class SheetHandle extends StatelessWidget {
       width: 44,
       height: 4,
       decoration: BoxDecoration(
-        color: const Color(0xFFD9E0E8),
+        color: context.palette.hint.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(2),
       ),
     ),
@@ -90,7 +90,7 @@ class _StatusOptionTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       child: Material(
-        color: selected ? AppColors.tealTint : Colors.transparent,
+        color: selected ? context.palette.tealTint : Colors.transparent,
         borderRadius: BorderRadius.circular(AppRadius.m),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppRadius.m),
@@ -111,7 +111,7 @@ class _StatusOptionTile extends StatelessWidget {
                   child: Icon(
                     StatusLabels.icon(status),
                     size: 20,
-                    color: plain ? AppColors.muted : color,
+                    color: plain ? context.palette.muted : color,
                   ),
                 ),
                 const SizedBox(width: 14),
@@ -121,7 +121,7 @@ class _StatusOptionTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-                      color: selected ? AppColors.tealDark : AppColors.ink,
+                      color: selected ? AppColors.tealDark : context.palette.ink,
                     ),
                   ),
                 ),

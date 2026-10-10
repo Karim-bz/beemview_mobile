@@ -19,6 +19,7 @@ A small Flutter app to browse projects, view their tasks, and update a task's st
 - **Project tasks**: list of a project's tasks, with a name search and a status filter. Both work on the tasks already loaded.
 - **Task details**: description, project, assignees, dates, status, priority and the latest comment.
 - **Update status**: pick a new status and add an optional note. The note is sent as a separate comment.
+- **Dark mode**: follows the phone setting by default. You can choose System, Light or Dark in Profile → Appearance.
 
 ---
 
@@ -76,6 +77,13 @@ Each feature has a small `ChangeNotifier` provider (auth, projects, project task
 It keeps the state of the screen: loading, empty, error or loaded.
 I chose Provider because the app is small and Provider is simple and easy to test.
 
+### Light and dark theme
+
+Colors that change with the theme (background, cards, text, borders) live in `AppPalette` in `lib/core/colors.dart`.
+Widgets read them with `context.palette.surface`, `context.palette.ink`, and so on, so they never use fixed colors.
+Brand colors (`AppColors.teal`, `orange`, `green`, `danger`) are the same in both themes.
+`ThemeProvider` keeps the user's choice and saves it with `shared_preferences`.
+
 ### Cleaning up the API data
 
 The API is not consistent between the task list and task details, so the models fix it:
@@ -108,15 +116,16 @@ While a save is running, the buttons are disabled to stop double submits.
 
 ## Packages
 
-| Package | Used for |
-|---|---|
-| `provider` | State management |
-| `dio` | API requests |
-| `flutter_secure_storage` | Saving the login token safely |
-| `connectivity_plus` | Offline banner |
-| `intl` | Date formatting |
-| `google_fonts` | App fonts (downloaded on first use) |
-| `mocktail` (dev) | Mocks in tests |
+| Package                  | Used for                            |
+| ------------------------ | ----------------------------------- |
+| `provider`               | State management                    |
+| `dio`                    | API requests                        |
+| `flutter_secure_storage` | Saving the login token safely       |
+| `connectivity_plus`      | Offline banner                      |
+| `intl`                   | Date formatting                     |
+| `google_fonts`           | App fonts (downloaded on first use) |
+| `shared_preferences`     | Remembering the theme choice        |
+| `mocktail` (dev)         | Mocks in tests                      |
 
 ---
 
@@ -126,10 +135,10 @@ While a save is running, the buttons are disabled to stop double submits.
 flutter test
 ```
 
-| File | What it checks |
-|---|---|
-| `status_and_format_test.dart` | Status labels and due-date helpers |
-| `task_mapping_test.dart` | Task list and details responses are mapped correctly |
+| File                          | What it checks                                       |
+| ----------------------------- | ---------------------------------------------------- |
+| `status_and_format_test.dart` | Status labels and due-date helpers                   |
+| `task_mapping_test.dart`      | Task list and details responses are mapped correctly |
 
 ---
 

@@ -82,16 +82,16 @@ class _CommentComposerSheetState extends State<_CommentComposerSheet> {
                 style: const TextStyle(fontSize: 15, height: 1.4),
                 decoration: InputDecoration(
                   hintText: 'Write your comment...',
-                  hintStyle: const TextStyle(
+                  hintStyle: TextStyle(
                     fontSize: 15,
-                    color: AppColors.hint,
+                    color: context.palette.hint,
                   ),
                   filled: true,
-                  fillColor: Colors.white,
+                  fillColor: context.palette.surface,
                   contentPadding: const EdgeInsets.all(16),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.l),
-                    borderSide: const BorderSide(color: AppColors.track),
+                    borderSide: BorderSide(color: context.palette.track),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.l),
@@ -107,9 +107,9 @@ class _CommentComposerSheetState extends State<_CommentComposerSheet> {
                 alignment: Alignment.centerRight,
                 child: Text(
                   '${_controller.text.length} / $kMaxCommentLength',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11.5,
-                    color: AppColors.hint,
+                    color: context.palette.hint,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -124,9 +124,9 @@ class _CommentComposerSheetState extends State<_CommentComposerSheet> {
                       child: OutlinedButton(
                         onPressed: () => Navigator.of(context).pop(),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.ink,
-                          backgroundColor: Colors.white,
-                          side: const BorderSide(color: AppColors.track),
+                          foregroundColor: context.palette.ink,
+                          backgroundColor: context.palette.surface,
+                          side: BorderSide(color: context.palette.track),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(AppRadius.m),
                           ),

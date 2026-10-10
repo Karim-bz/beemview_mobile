@@ -132,13 +132,13 @@ class ProjectOverviewState extends State<ProjectOverview> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'PROJECT',
                       style: TextStyle(
                         fontSize: 10.5,
                         letterSpacing: 0.8,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.muted,
+                        color: context.palette.muted,
                       ),
                     ),
                     Text(
@@ -156,9 +156,9 @@ class ProjectOverviewState extends State<ProjectOverview> {
                         unitName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11.5,
-                          color: AppColors.muted,
+                          color: context.palette.muted,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -186,10 +186,10 @@ class ProjectOverviewState extends State<ProjectOverview> {
                 overflow: _expanded
                     ? TextOverflow.visible
                     : TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13.5,
                   height: 1.5,
-                  color: AppColors.muted,
+                  color: context.palette.muted,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -206,7 +206,7 @@ class ProjectOverviewState extends State<ProjectOverview> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.track.withValues(alpha: 0.35),
+                color: context.palette.track.withValues(alpha: 0.35),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -231,9 +231,9 @@ class ProjectOverviewState extends State<ProjectOverview> {
                             nextDueTaskName,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11.5,
-                              color: AppColors.muted,
+                              color: context.palette.muted,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -264,17 +264,17 @@ class ProjectOverviewState extends State<ProjectOverview> {
                   if (names.isNotEmpty)
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.people_outline,
                           size: 18,
-                          color: AppColors.muted,
+                          color: context.palette.muted,
                         ),
                         const SizedBox(width: 10),
-                        const Text(
+                        Text(
                           'Assignees',
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.muted,
+                            color: context.palette.muted,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -341,13 +341,13 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 18, color: AppColors.muted),
+        Icon(icon, size: 18, color: context.palette.muted),
         const SizedBox(width: 10),
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 12,
-            color: AppColors.muted,
+            color: context.palette.muted,
             fontWeight: FontWeight.w600,
           ),
         ),

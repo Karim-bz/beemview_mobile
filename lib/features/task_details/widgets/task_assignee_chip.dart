@@ -12,7 +12,7 @@ class AssigneeChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(5, 5, 12, 5),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: AppShadows.soft,
       ),

@@ -77,8 +77,8 @@ class AvatarStack extends StatelessWidget {
     Widget bubble(Widget child) => Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: context.palette.surface,
         shape: BoxShape.circle,
       ),
       padding: const EdgeInsets.all(ring),

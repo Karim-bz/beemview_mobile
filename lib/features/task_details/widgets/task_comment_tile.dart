@@ -40,9 +40,9 @@ class CommentTile extends StatelessWidget {
                     if (comment.createdAt != null)
                       Text(
                         relTime(comment.createdAt!),
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.muted,
+                          color: context.palette.muted,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

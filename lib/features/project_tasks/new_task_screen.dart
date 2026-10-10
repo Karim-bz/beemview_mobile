@@ -212,7 +212,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: context.palette.canvas,
       body: SafeArea(
         child: Column(
           children: [
@@ -242,9 +242,9 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                           widget.projectName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12.5,
-                            color: AppColors.muted,
+                            color: context.palette.muted,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -287,6 +287,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                               hint: 'e.g. Create employee module',
                               icon: Icons.task_alt_rounded,
                               focused: _nameFocus.hasFocus,
+                              context: context,
                             ),
                           ),
                         ),
@@ -380,6 +381,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                               hint: 'What needs to be done?',
                               focused: _descriptionFocus.hasFocus,
                               padding: const EdgeInsets.all(16),
+                              context: context,
                             ),
                           ),
                         ),
@@ -389,9 +391,9 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                             padding: const EdgeInsets.only(top: 6, right: 4),
                             child: Text(
                               '${_descriptionController.text.length} / $_maxDescriptionLength',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11.5,
-                                color: AppColors.hint,
+                                color: context.palette.hint,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -458,7 +460,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
           Icon(
             _isPrivate ? Icons.lock_rounded : Icons.lock_open_rounded,
             size: 20,
-            color: _isPrivate ? AppColors.teal : AppColors.muted,
+            color: _isPrivate ? AppColors.teal : context.palette.muted,
           ),
           const SizedBox(width: 12),
           const Expanded(
@@ -494,7 +496,7 @@ class _RemovableAssignee extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(5, 5, 6, 5),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: AppShadows.soft,
       ),
@@ -511,9 +513,13 @@ class _RemovableAssignee extends StatelessWidget {
           GestureDetector(
             onTap: onRemove,
             behavior: HitTestBehavior.opaque,
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.all(4),
-              child: Icon(Icons.close_rounded, size: 15, color: AppColors.hint),
+              child: Icon(
+                Icons.close_rounded,
+                size: 15,
+                color: context.palette.hint,
+              ),
             ),
           ),
         ],
@@ -606,7 +612,7 @@ class _PersonTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       child: Material(
-        color: selected ? AppColors.tealTint : Colors.transparent,
+        color: selected ? context.palette.tealTint : Colors.transparent,
         borderRadius: BorderRadius.circular(AppRadius.m),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppRadius.m),
@@ -623,7 +629,9 @@ class _PersonTile extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-                      color: selected ? AppColors.tealDark : AppColors.ink,
+                      color: selected
+                          ? AppColors.tealDark
+                          : context.palette.ink,
                     ),
                   ),
                 ),

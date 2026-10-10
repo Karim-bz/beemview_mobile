@@ -40,9 +40,9 @@ class InfoTile extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.muted,
+                    color: context.palette.muted,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

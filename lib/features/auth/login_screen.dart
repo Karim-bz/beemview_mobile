@@ -109,7 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(gradient: AppGradients.sky),
+        decoration: BoxDecoration(gradient: context.palette.skyGradient),
         child: SafeArea(
           child: Center(
             child: ConstrainedBox(
@@ -138,11 +138,11 @@ class _LoginScreenState extends State<LoginScreen> {
             child: CircularProgressIndicator(strokeWidth: 3),
           ),
           const SizedBox(height: 14),
-          const Text(
+          Text(
             'Signing in...',
             style: TextStyle(
               fontSize: 13.5,
-              color: AppColors.muted,
+              color: context.palette.muted,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -158,12 +158,12 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 10),
         const BeemViewWordmark(fontSize: 30),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Manage your projects,\nget things done.',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
-            color: AppColors.muted,
+            color: context.palette.muted,
             height: 1.35,
             fontWeight: FontWeight.w500,
           ),
@@ -191,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 160),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.palette.surface,
         borderRadius: BorderRadius.circular(AppRadius.m),
         border: Border.all(
           color: focused ? AppColors.teal : Colors.transparent,
@@ -212,12 +212,12 @@ class _LoginScreenState extends State<LoginScreen> {
         decoration: InputDecoration(
           prefixIcon: Icon(
             icon,
-            color: focused ? AppColors.teal : AppColors.muted,
+            color: focused ? AppColors.teal : context.palette.muted,
             size: 20,
           ),
           suffixIcon: suffix,
           hintText: hint,
-          hintStyle: const TextStyle(color: AppColors.muted, fontSize: 15),
+          hintStyle: TextStyle(color: context.palette.muted, fontSize: 15),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
@@ -246,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.dangerTint,
+                  color: context.palette.dangerTint,
                   borderRadius: BorderRadius.circular(AppRadius.m),
                 ),
                 child: Row(
@@ -300,7 +300,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   _isPasswordObscured
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
-                  color: AppColors.muted,
+                  color: context.palette.muted,
                   size: 20,
                 ),
                 onPressed: () =>

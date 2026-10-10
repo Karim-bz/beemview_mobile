@@ -19,18 +19,18 @@ class CommentBar extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.fromLTRB(20, 6, 6, 6),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.palette.surface,
             borderRadius: BorderRadius.circular(28),
             boxShadow: AppShadows.soft,
           ),
           child: Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Write a comment...',
                   style: TextStyle(
                     fontSize: 14.5,
-                    color: AppColors.hint,
+                    color: context.palette.hint,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

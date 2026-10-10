@@ -132,7 +132,7 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<ProjectTasksProvider>();
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      backgroundColor: context.palette.canvas,
       floatingActionButton: AddFab(onTap: _openNewTask),
       body: SafeArea(
         bottom: false,
@@ -160,9 +160,9 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
                         ),
                         Text(
                           _subtitle(provider.tasks),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12.5,
-                            color: AppColors.muted,
+                            color: context.palette.muted,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -182,7 +182,7 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
   Widget _searchAndChips(List<Task> all) {
     return Column(
       children: [
-        const Align(
+        Align(
           alignment: Alignment.centerLeft,
           child: Padding(
             padding: EdgeInsets.only(left: 2, bottom: 8),
@@ -191,7 +191,7 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppColors.muted,
+                color: context.palette.muted,
               ),
             ),
           ),
@@ -328,7 +328,7 @@ class _ProjectTasksScreenState extends State<ProjectTasksScreen> {
               fontWeight: FontWeight.w700,
               color: bucket == _Bucket.overdue
                   ? AppColors.danger
-                  : AppColors.muted,
+                  : context.palette.muted,
             ),
           ),
         ),
