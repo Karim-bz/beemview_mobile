@@ -87,13 +87,13 @@ class AvatarStack extends StatelessWidget {
 
     final children = <Widget>[
       for (var i = 0; i < shown.length; i++)
-        Positioned(
-          left: i * step,
+        PositionedDirectional(
+          start: i * step,
           child: bubble(InitialsAvatar(name: shown[i], radius: radius)),
         ),
       if (extra > 0)
-        Positioned(
-          left: shown.length * step,
+        PositionedDirectional(
+          start: shown.length * step,
           child: bubble(
             CircleAvatar(
               radius: radius,

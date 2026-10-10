@@ -5,9 +5,12 @@ import '../../core/colors.dart';
 import '../../shared/widgets/app_card.dart';
 import '../../shared/widgets/initials_avatar.dart';
 import '../appearance/appearance_sheet.dart';
+import '../appearance/language_sheet.dart';
+import '../appearance/locale_provider.dart';
 import '../appearance/theme_provider.dart';
 import '../auth/auth_provider.dart';
 import '../projects/projects_provider.dart';
+import '../../l10n/app_strings.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -15,7 +18,7 @@ class ProfileScreen extends StatelessWidget {
   void _comingSoon(BuildContext context, String what) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$what — coming soon')));
+      ..showSnackBar(SnackBar(content: Text(context.l10n.comingSoon(what))));
   }
 
   @override
@@ -30,8 +33,8 @@ class ProfileScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
           children: [
-            const Text(
-              'Profile',
+            Text(
+              context.l10n.navProfile,
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.w800,
@@ -40,7 +43,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             _HeroCard(
-              name: user?.fullName ?? 'Unknown user',
+              name: user?.fullName ?? context.l10n.unknownUser,
               email: user?.email,
               initials: user == null
                   ? '?'
@@ -55,27 +58,30 @@ class ProfileScreen extends StatelessWidget {
                   _SettingsRow(
                     icon: Icons.notifications_none_rounded,
                     color: AppColors.teal,
-                    label: 'Notifications',
-                    onTap: () => _comingSoon(context, 'Notification settings'),
+                    label: context.l10n.navNotifications,
+                    onTap: () => _comingSoon(context, context.l10n.notificationSettings),
                   ),
                   _SettingsRow(
                     icon: Icons.dark_mode_outlined,
                     color: const Color(0xFF7B61FF),
-                    label: 'Appearance',
-                    value: themeModeLabel(context.watch<ThemeProvider>().mode),
+                    label: context.l10n.appearance,
+                    value: themeModeLabel(context.l10n, context.watch<ThemeProvider>().mode),
                     onTap: () => showAppearanceSheet(context),
                   ),
                   _SettingsRow(
                     icon: Icons.public_rounded,
                     color: AppColors.green,
-                    label: 'Language',
-                    value: 'English',
-                    onTap: () => _comingSoon(context, 'Language'),
+                    label: context.l10n.language,
+                    value: languageLabel(
+                      context.l10n,
+                      context.watch<LocaleProvider>().locale,
+                    ),
+                    onTap: () => showLanguageSheet(context),
                   ),
                   _SettingsRow(
                     icon: Icons.info_outline_rounded,
                     color: AppColors.orange,
-                    label: 'Version',
+                    label: context.l10n.version,
                     value: '1.0.0',
                     onTap: () => {},
                     notClickable: true,
@@ -89,8 +95,8 @@ class ProfileScreen extends StatelessWidget {
               child: TextButton.icon(
                 onPressed: () => context.read<AuthProvider>().logout(),
                 icon: const Icon(Icons.logout_rounded, size: 19),
-                label: const Text(
-                  'Sign out',
+                label: Text(
+                  context.l10n.signOut,
                   style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
                 ),
                 style: TextButton.styleFrom(
@@ -204,11 +210,11 @@ class _HeroCard extends StatelessWidget {
                   const SizedBox(height: 18),
                   Row(
                     children: [
-                      _StatTile(value: stats.completed, label: 'Completed'),
+                      _StatTile(value: stats.completed, label: context.l10n.statusDone),
                       const SizedBox(width: 10),
-                      _StatTile(value: stats.inProgress, label: 'In progress'),
+                      _StatTile(value: stats.inProgress, label: context.l10n.statusInProgress),
                       const SizedBox(width: 10),
-                      _StatTile(value: stats.overdue, label: 'Overdue'),
+                      _StatTile(value: stats.overdue, label: context.l10n.overdue),
                     ],
                   ),
                 ],
@@ -309,7 +315,7 @@ class _SettingsRow extends StatelessWidget {
             ),
             if (value != null)
               Padding(
-                padding: const EdgeInsets.only(right: 6),
+                padding: const EdgeInsetsDirectional.only(end: 6),
                 child: Text(
                   value!,
                   style: TextStyle(

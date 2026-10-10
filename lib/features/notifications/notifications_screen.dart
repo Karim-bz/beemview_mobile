@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/colors.dart';
 import '../shell/main_shell.dart';
+import '../../l10n/app_strings.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -15,10 +16,10 @@ class NotificationsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.fromLTRB(20, 18, 20, 0),
               child: Text(
-                'Notifications',
+                context.l10n.navNotifications,
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w800,
@@ -35,8 +36,8 @@ class NotificationsScreen extends StatelessWidget {
                     children: [
                       const _BellIllustration(),
                       const SizedBox(height: 24),
-                      const Text(
-                        "You're all caught up",
+                      Text(
+                        context.l10n.allCaughtUp,
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
@@ -44,8 +45,7 @@ class NotificationsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Comments, status changes and new\n'
-                        'assignments will show up here.',
+                        context.l10n.notificationsHint,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
@@ -68,8 +68,8 @@ class NotificationsScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(AppRadius.m),
                           ),
                         ),
-                        child: const Text(
-                          'View my tasks',
+                        child: Text(
+                          context.l10n.viewMyTasks,
                           style: TextStyle(
                             fontWeight: FontWeight.w800,
                             fontSize: 14,

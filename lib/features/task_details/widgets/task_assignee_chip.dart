@@ -10,7 +10,7 @@ class AssigneeChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(5, 5, 12, 5),
+      padding: const EdgeInsetsDirectional.fromSTEB(5, 5, 12, 5),
       decoration: BoxDecoration(
         color: context.palette.surface,
         borderRadius: BorderRadius.circular(20),

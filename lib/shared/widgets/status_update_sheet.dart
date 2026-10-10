@@ -4,6 +4,7 @@ import '../../core/colors.dart';
 import 'comment_composer_sheet.dart' show GradientButton, kMaxCommentLength;
 import 'status_picker_sheet.dart' show SheetHandle;
 import 'status_pill.dart';
+import '../../l10n/app_strings.dart';
 
 /// What the user confirmed in the status update sheet.
 class StatusUpdateRequest {
@@ -82,8 +83,8 @@ class _StatusUpdateSheetState extends State<_StatusUpdateSheet> {
             children: [
               const SheetHandle(),
               const SizedBox(height: 16),
-              const Text(
-                'Update status',
+              Text(
+                context.l10n.updateStatus,
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 14),
@@ -117,7 +118,7 @@ class _StatusUpdateSheetState extends State<_StatusUpdateSheet> {
                 textInputAction: TextInputAction.newline,
                 style: const TextStyle(fontSize: 15, height: 1.4),
                 decoration: InputDecoration(
-                  hintText: 'Add a note (optional). Posted as a comment.',
+                  hintText: context.l10n.addNoteHint,
                   hintStyle: TextStyle(
                     fontSize: 15,
                     color: context.palette.hint,
@@ -140,7 +141,7 @@ class _StatusUpdateSheetState extends State<_StatusUpdateSheet> {
               ),
               const SizedBox(height: 6),
               Align(
-                alignment: Alignment.centerRight,
+                alignment: AlignmentDirectional.centerEnd,
                 child: Text(
                   '${_controller.text.length} / $kMaxCommentLength',
                   style: TextStyle(
@@ -167,8 +168,8 @@ class _StatusUpdateSheetState extends State<_StatusUpdateSheet> {
                             borderRadius: BorderRadius.circular(AppRadius.m),
                           ),
                         ),
-                        child: const Text(
-                          'Cancel',
+                        child: Text(
+                          context.l10n.cancel,
                           style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 15,
@@ -181,7 +182,7 @@ class _StatusUpdateSheetState extends State<_StatusUpdateSheet> {
                   Expanded(
                     flex: 6,
                     child: GradientButton(
-                      label: 'Save status',
+                      label: context.l10n.saveStatus,
                       icon: Icons.check_rounded,
                       onPressed: _submit,
                     ),

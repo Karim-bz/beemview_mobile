@@ -13,6 +13,7 @@ import '../shell/main_shell.dart';
 import '../project_tasks/project_tasks_screen.dart';
 import 'new_project_screen.dart';
 import 'projects_provider.dart';
+import '../../l10n/app_strings.dart';
 
 /// Raw API statuses shown as filter chips, in display order.
 /// Labels are rendered via [StatusLabels.label].
@@ -75,7 +76,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
   void _comingSoon(String what) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$what — coming soon')));
+      ..showSnackBar(SnackBar(content: Text(context.l10n.comingSoon(what))));
   }
 
   Future<void> _openNewProject() async {
@@ -85,7 +86,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     if (created == true && mounted) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(const SnackBar(content: Text('Project created')));
+        ..showSnackBar(SnackBar(content: Text(context.l10n.projectCreated)));
     }
   }
 
@@ -106,8 +107,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
               child: _Header(
                 greeting: name.isEmpty
-                    ? greeting()
-                    : '${greeting()}, ${firstName(name)} 👋',
+                    ? context.l10n.greeting(DateTime.now().hour)
+                    : context.l10n.greetingNamed(
+                        DateTime.now().hour,
+                        firstName(name),
+                      ),
                 initials: name.isEmpty ? '?' : InitialsAvatar.initialsOf(name),
                 onAvatarTap: () => shellIndex.value = 3,
               ),
@@ -136,7 +140,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         Expanded(
           child: SearchField(
             controller: _searchController,
-            hint: 'Search projects...',
+            hint: context.l10n.searchProjects,
           ),
         ),
         const SizedBox(width: 10),
@@ -155,7 +159,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               size: 20,
             ),
             padding: EdgeInsets.zero,
-            onPressed: () => _comingSoon('Advanced filters'),
+            onPressed: () => _comingSoon(context.l10n.advancedFilters),
           ),
         ),
       ],
@@ -185,7 +189,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         itemBuilder: (context, index) {
           final status = options[index];
           return FilterPill(
-            label: status == null ? 'All' : StatusLabels.label(status),
+            label: status == null ? context.l10n.all : StatusLabels.label(context.l10n, status),
             count: counts[status] ?? 0,
             selected: _statusFilter == status,
             onTap: () => setState(() => _statusFilter = status),
@@ -199,10 +203,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     switch (provider.status) {
       case ProjectsStatus.idle:
       case ProjectsStatus.loading:
-        return const LoadingView(message: 'Loading projects...');
+        return LoadingView(message: context.l10n.loadingProjects);
       case ProjectsStatus.error:
         return ErrorView(
-          message: provider.error ?? 'Failed to load projects.',
+          message: provider.error ?? context.l10n.failedLoadProjects,
           onRetry: _refresh,
         );
       case ProjectsStatus.loaded:
@@ -210,10 +214,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           return RefreshIndicator(
             onRefresh: _refresh,
             child: ListView(
-              children: const [
+              children: [
                 SizedBox(height: 100),
                 EmptyView(
-                  message: 'No projects available yet.',
+                  message: context.l10n.noProjects,
                   icon: Icons.folder_open_outlined,
                 ),
               ],
@@ -225,10 +229,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           return RefreshIndicator(
             onRefresh: _refresh,
             child: ListView(
-              children: const [
+              children: [
                 SizedBox(height: 100),
                 EmptyView(
-                  message: 'No projects match your filters.',
+                  message: context.l10n.noProjectsMatch,
                   icon: Icons.search_off_rounded,
                 ),
               ],
@@ -286,8 +290,8 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               borderRadius: BorderRadius.circular(AppRadius.m),
             ),
           ),
-          child: const Text(
-            'Load more',
+          child: Text(
+            context.l10n.loadMore,
             style: TextStyle(fontWeight: FontWeight.w700),
           ),
         ),
@@ -326,8 +330,8 @@ class _Header extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              const Text(
-                'Projects',
+              Text(
+                context.l10n.navProjects,
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w800,
@@ -479,8 +483,8 @@ class _ProjectCard extends StatelessWidget {
             children: [
               Text(
                 tasks == 0
-                    ? 'No tasks yet'
-                    : '${project.doneCount} of $tasks tasks done',
+                    ? context.l10n.noTasksYet
+                    : context.l10n.doneOfTasks(project.doneCount, tasks),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: tasks == 0 ? FontWeight.w500 : FontWeight.w700,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/status_labels.dart';
+import '../../l10n/app_strings.dart';
 
 /// Small tinted pill that renders a status label.
 class StatusPill extends StatelessWidget {
@@ -37,7 +38,7 @@ class StatusPill extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            StatusLabels.label(status),
+            StatusLabels.label(context.l10n, status),
             style: TextStyle(
               fontSize: large ? 12.5 : 11,
               fontWeight: FontWeight.w700,

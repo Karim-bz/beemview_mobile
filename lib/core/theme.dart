@@ -7,10 +7,14 @@ import 'colors.dart';
 class AppTheme {
   const AppTheme._();
 
-  static ThemeData get light => _build(AppPalette.light);
-  static ThemeData get dark => _build(AppPalette.dark);
+  /// [arabic] switches to a font that has Arabic letters.
+  static ThemeData light({bool arabic = false}) =>
+      _build(AppPalette.light, arabic: arabic);
 
-  static ThemeData _build(AppPalette p) {
+  static ThemeData dark({bool arabic = false}) =>
+      _build(AppPalette.dark, arabic: arabic);
+
+  static ThemeData _build(AppPalette p, {required bool arabic}) {
     final isDark = p.brightness == Brightness.dark;
 
     final base = ThemeData(
@@ -28,9 +32,10 @@ class AppTheme {
     );
 
     return base.copyWith(
-      textTheme: GoogleFonts.plusJakartaSansTextTheme(
-        base.textTheme,
-      ).apply(bodyColor: p.ink, displayColor: p.ink),
+      textTheme: (arabic
+              ? GoogleFonts.cairoTextTheme(base.textTheme)
+              : GoogleFonts.plusJakartaSansTextTheme(base.textTheme))
+          .apply(bodyColor: p.ink, displayColor: p.ink),
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,

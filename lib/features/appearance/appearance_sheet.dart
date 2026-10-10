@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../core/colors.dart';
 import '../../shared/widgets/status_picker_sheet.dart' show SheetHandle;
 import 'theme_provider.dart';
+import '../../l10n/app_strings.dart';
 
 /// Bottom sheet to choose between system, light and dark theme.
 Future<void> showAppearanceSheet(BuildContext context) {
@@ -40,8 +41,8 @@ class _AppearanceSheet extends StatelessWidget {
         children: [
           const SheetHandle(),
           const SizedBox(height: 16),
-          const Text(
-            'Appearance',
+          Text(
+            context.l10n.appearance,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
           ),
           const SizedBox(height: 8),
@@ -50,7 +51,7 @@ class _AppearanceSheet extends StatelessWidget {
               contentPadding: EdgeInsets.zero,
               leading: Icon(_iconFor(mode), color: AppColors.teal),
               title: Text(
-                themeModeLabel(mode),
+                themeModeLabel(context.l10n, mode),
                 style: const TextStyle(fontWeight: FontWeight.w700),
               ),
               trailing: provider.mode == mode

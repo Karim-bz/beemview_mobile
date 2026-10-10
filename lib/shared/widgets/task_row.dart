@@ -5,6 +5,7 @@ import '../../core/format.dart';
 import '../../data/models/task.dart';
 import 'priority_pill.dart';
 import 'status_pill.dart';
+import '../../l10n/app_strings.dart';
 
 class TaskRow extends StatelessWidget {
   const TaskRow({super.key, required this.task, this.onTap});
@@ -35,7 +36,7 @@ class TaskRow extends StatelessWidget {
                   Container(width: 5, color: barColor),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
+                      padding: const EdgeInsetsDirectional.fromSTEB(14, 14, 12, 14),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -103,10 +104,10 @@ class _DueLabel extends StatelessWidget {
         : context.palette.muted;
 
     final text = isToday
-        ? 'Today'
+        ? context.l10n.today
         : closed || days == null
-        ? fmtShort(task.dueDate!)
-        : '${fmtShort(task.dueDate!)} · ${days}d';
+        ? fmtShort(context.l10n, task.dueDate!)
+        : '${fmtShort(context.l10n, task.dueDate!)} · ${context.l10n.daysShort(days)}';
 
     return Row(
       mainAxisSize: MainAxisSize.min,

@@ -1,8 +1,11 @@
 import 'package:beemview_mobile/core/format.dart';
 import 'package:beemview_mobile/core/status_labels.dart';
+import 'package:beemview_mobile/l10n/app_strings.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  const en = AppStringsEn();
+
   group('StatusLabels.label', () {
     test('every API status value has a readable label', () {
       const apiValues = [
@@ -17,25 +20,25 @@ void main() {
       ];
 
       for (final value in apiValues) {
-        final label = StatusLabels.label(value);
+        final label = StatusLabels.label(en, value);
         expect(label, isNotEmpty, reason: value);
         expect(label, isNot(value), reason: '$value must not show raw');
       }
     });
 
     test('maps the multi-word statuses', () {
-      expect(StatusLabels.label('to_do'), 'To do');
-      expect(StatusLabels.label('in_progress'), 'In progress');
-      expect(StatusLabels.label('changes_requested'), 'Changes requested');
+      expect(StatusLabels.label(en, 'to_do'), 'To do');
+      expect(StatusLabels.label(en, 'in_progress'), 'In progress');
+      expect(StatusLabels.label(en, 'changes_requested'), 'Changes requested');
     });
 
     test('shows a dash for null or empty values', () {
-      expect(StatusLabels.label(null), '—');
-      expect(StatusLabels.label(''), '—');
+      expect(StatusLabels.label(en, null), '—');
+      expect(StatusLabels.label(en, ''), '—');
     });
 
     test('humanizes an unknown status instead of crashing', () {
-      expect(StatusLabels.label('needs_review'), 'Needs review');
+      expect(StatusLabels.label(en, 'needs_review'), 'Needs review');
     });
   });
 

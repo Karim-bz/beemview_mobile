@@ -1,35 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_strings.dart';
+
 /// Central mapping for task/project status values.
 class StatusLabels {
   const StatusLabels._();
 
-  static String label(String? status) {
-    switch (status) {
-      case 'planning':
-        return 'Planning';
-      case 'to_do':
-        return 'To do';
-      case 'in_progress':
-        return 'In progress';
-      case 'review':
-        return 'Review';
-      case 'on_hold':
-        return 'Paused';
-      case 'done':
-        return 'Completed';
-      case 'blocked':
-        return 'Blocked';
-      case 'changes_requested':
-        return 'Changes requested';
-      case 'canceled':
-        return 'Canceled';
-      default:
-        if (status == null || status.isEmpty) return '—';
-        final spaced = status.replaceAll('_', ' ');
-        return spaced[0].toUpperCase() + spaced.substring(1);
-    }
-  }
+  static String label(AppStrings s, String? status) => s.statusLabel(status);
 
   /// Accent color used for status pills.
   static Color color(String? status) {
@@ -58,8 +35,8 @@ class StatusLabels {
   }
 
   /// Compact label for tight chips ("Changes requested" -> "Changes").
-  static String shortLabel(String? status) =>
-      status == 'changes_requested' ? 'Changes' : label(status);
+  static String shortLabel(AppStrings s, String? status) =>
+      s.statusShortLabel(status);
 
   /// Icon shown in the status picker.
   static IconData icon(String? status) {

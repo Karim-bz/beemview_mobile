@@ -7,6 +7,7 @@ import '../../core/config.dart';
 import '../../shared/widgets/beemview_wordmark.dart';
 import '../../shared/widgets/comment_composer_sheet.dart' show GradientButton;
 import 'auth_provider.dart';
+import '../../l10n/app_strings.dart';
 
 enum LoginState { empty, filled, loading, error }
 
@@ -57,17 +58,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String? _validateEmail(String? v) {
     final value = v?.trim() ?? '';
-    if (value.isEmpty) return 'Email is required';
+    if (value.isEmpty) return context.l10n.emailRequired;
     if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value)) {
-      return 'Enter a valid email';
+      return context.l10n.emailInvalid;
     }
     return null;
   }
 
   String? _validatePassword(String? v) {
     final value = v ?? '';
-    if (value.isEmpty) return 'Password is required';
-    if (value.length < 6) return 'Password must be at least 6 characters';
+    if (value.isEmpty) return context.l10n.passwordRequired;
+    if (value.length < 6) return context.l10n.passwordTooShort;
     return null;
   }
 
@@ -96,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!ok) {
         _errorMessage =
             context.read<AuthProvider>().error ??
-            'Login failed. Please try again.';
+            context.l10n.loginFailed;
       }
     });
   }
@@ -139,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           const SizedBox(height: 14),
           Text(
-            'Signing in...',
+            context.l10n.signingIn,
             style: TextStyle(
               fontSize: 13.5,
               color: context.palette.muted,
@@ -159,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
         const BeemViewWordmark(fontSize: 30),
         const SizedBox(height: 6),
         Text(
-          'Manage your projects,\nget things done.',
+          context.l10n.loginTagline,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 14,
@@ -277,7 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
             _field(
               controller: _emailController,
               focus: _emailFocus,
-              hint: 'Email address',
+              hint: context.l10n.emailHint,
               icon: Icons.mail_outline_rounded,
               validator: _validateEmail,
               keyboardType: TextInputType.emailAddress,
@@ -288,7 +289,7 @@ class _LoginScreenState extends State<LoginScreen> {
             _field(
               controller: _passwordController,
               focus: _passwordFocus,
-              hint: 'Password',
+              hint: context.l10n.passwordHint,
               icon: Icons.lock_outline_rounded,
               validator: _validatePassword,
               action: TextInputAction.done,
@@ -308,14 +309,16 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             Align(
-              alignment: Alignment.centerRight,
+              alignment: AlignmentDirectional.centerEnd,
               child: TextButton(
                 onPressed: () {
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
                     ..showSnackBar(
-                      const SnackBar(
-                        content: Text('Password reset — coming soon'),
+                      SnackBar(
+                        content: Text(
+                          context.l10n.comingSoon(context.l10n.passwordReset),
+                        ),
                       ),
                     );
                 },
@@ -326,15 +329,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     vertical: 8,
                   ),
                 ),
-                child: const Text(
-                  'Forgot password?',
+                child: Text(
+                  context.l10n.forgotPassword,
                   style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                 ),
               ),
             ),
             const SizedBox(height: 6),
             GradientButton(
-              label: 'Sign in',
+              label: context.l10n.signIn,
               height: 56,
               onPressed: _submitting ? null : _handleSignIn,
             ),

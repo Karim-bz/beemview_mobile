@@ -4,6 +4,7 @@ import 'api_exception.dart';
 import 'config.dart';
 import 'connectivity_service.dart';
 import 'secure_storage.dart';
+import '../l10n/app_strings.dart';
 
 /// Thin wrapper around Dio.
 ///
@@ -11,8 +12,13 @@ import 'secure_storage.dart';
 /// - Turns any error into [ApiException].
 /// - Notifies [onUnauthorized] when the API returns 401.
 class ApiClient {
-  ApiClient({required this._storage, required this._connectivity, Dio? dio})
-    : _dio = dio ?? Dio() {
+  ApiClient({
+    required this._storage,
+    required this._connectivity,
+    Dio? dio,
+    AppStrings Function()? strings,
+  }) : _dio = dio ?? Dio(),
+       _strings = strings ?? (() => const AppStringsEn()) {
     _dio.options
       ..baseUrl = AppConfig.apiBaseUrl
       ..connectTimeout = const Duration(
@@ -23,7 +29,7 @@ class ApiClient {
       )
       ..sendTimeout = const Duration(milliseconds: AppConfig.sendTimeoutMs)
       ..contentType = Headers.jsonContentType
-      ..headers = {'Accept': 'application/json', 'Accept-Language': 'en'}
+      ..headers = {'Accept': 'application/json'}
       ..validateStatus = (status) =>
           status != null && status >= 200 && status < 300;
 
@@ -34,6 +40,7 @@ class ApiClient {
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
+          options.headers['Accept-Language'] = _acceptLanguage;
           handler.next(options);
         },
       ),
@@ -43,6 +50,14 @@ class ApiClient {
   final Dio _dio;
   final SecureStorageService _storage;
   final ConnectivityService _connectivity;
+  final AppStrings Function() _strings;
+
+  /// Texts in the current app language, for messages made in this layer.
+  AppStrings get strings => _strings();
+
+  /// Asks the server for messages in the app language (English as fallback).
+  /// The app never depends on the wording of server messages.
+  String get _acceptLanguage => _strings().languageCode == 'ar' ? 'ar' : 'en';
 
   /// Called when a request returns 401. The auth layer sets this so it
   /// can clear the session and send the user back to login.
@@ -60,10 +75,7 @@ class ApiClient {
   Future<Response<T>> _send<T>(Future<Response<T>> Function() request) async {
     // Fail fast if there's no network interface at all.
     if (!await _connectivity.isOnline()) {
-      throw ApiException(
-        'You appear to be offline. Check your connection and try again.',
-        isNetworkError: true,
-      );
+      throw ApiException(_strings().errOffline, isNetworkError: true);
     }
 
     try {
@@ -79,17 +91,11 @@ class ApiClient {
     if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.sendTimeout ||
         e.type == DioExceptionType.receiveTimeout) {
-      return ApiException(
-        'Request timed out. Please try again.',
-        isNetworkError: true,
-      );
+      return ApiException(_strings().errTimeout, isNetworkError: true);
     }
     if (e.type == DioExceptionType.connectionError ||
         e.type == DioExceptionType.unknown) {
-      return ApiException(
-        'Could not reach the server. Check your connection and try again.',
-        isNetworkError: true,
-      );
+      return ApiException(_strings().errUnreachable, isNetworkError: true);
     }
 
     final status = e.response?.statusCode;
@@ -108,19 +114,20 @@ class ApiClient {
   }
 
   String _defaultMessage(int? status) {
+    final s = _strings();
     switch (status) {
       case 400:
-        return 'The request was invalid.';
+        return s.errBadRequest;
       case 401:
-        return 'Session expired. Please sign in again.';
+        return s.errSessionExpired;
       case 403:
-        return 'You do not have access to this resource.';
+        return s.errForbidden;
       case 404:
-        return 'The requested resource was not found.';
+        return s.errNotFound;
       case 429:
-        return 'Too many requests. Please try again later.';
+        return s.errTooMany;
       default:
-        return 'Something went wrong. Please try again.';
+        return s.errGeneric;
     }
   }
 }

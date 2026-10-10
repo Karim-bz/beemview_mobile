@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/colors.dart';
+import '../../../l10n/app_strings.dart';
 
 /// Shown when a status was saved but its optional note failed to post.
 /// Offers to retry the comment only, or to discard the note.
@@ -44,7 +45,7 @@ class PendingNoteBanner extends StatelessWidget {
               SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Status saved, but your note was not sent',
+                  context.l10n.noteNotSentTitle,
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),
                 ),
               ),
@@ -60,8 +61,7 @@ class PendingNoteBanner extends StatelessWidget {
           if (maybeSent) ...[
             const SizedBox(height: 8),
             Text(
-              'The connection dropped, so the note may have been delivered. '
-              'Pull to refresh and check the comments before retrying.',
+              context.l10n.noteMaybeDelivered,
               style: TextStyle(fontSize: 12.5, color: context.palette.muted),
             ),
           ],
@@ -71,13 +71,13 @@ class PendingNoteBanner extends StatelessWidget {
             children: [
               TextButton(
                 onPressed: busy ? null : onDiscard,
-                child: const Text('Discard note'),
+                child: Text(context.l10n.discardNote),
               ),
               const SizedBox(width: 8),
               FilledButton(
                 onPressed: busy ? null : onRetry,
                 style: FilledButton.styleFrom(backgroundColor: AppColors.teal),
-                child: const Text('Retry note'),
+                child: Text(context.l10n.retryNote),
               ),
             ],
           ),

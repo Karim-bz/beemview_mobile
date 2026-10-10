@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/colors.dart';
+import '../../l10n/app_strings.dart';
 
 /// Centered spinner used during initial loads.
 class LoadingView extends StatelessWidget {
@@ -96,8 +97,8 @@ class ErrorView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(AppRadius.m),
                   ),
                 ),
-                child: const Text(
-                  'Retry',
+                child: Text(
+                  context.l10n.retry,
                   style: TextStyle(fontWeight: FontWeight.w700),
                 ),
               ),

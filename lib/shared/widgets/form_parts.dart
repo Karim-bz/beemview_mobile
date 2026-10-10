@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/colors.dart';
 import '../../core/format.dart';
 import 'app_card.dart';
+import '../../l10n/app_strings.dart';
 
 /// Text style used inside form fields.
 const kInputStyle = TextStyle(fontSize: 15, fontWeight: FontWeight.w500);
@@ -49,7 +50,7 @@ class FormLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
+      padding: const EdgeInsetsDirectional.only(start: 4, bottom: 8),
       child: Text(
         text,
         style: TextStyle(
@@ -70,7 +71,7 @@ class FormFieldError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 6, top: 6),
+      padding: const EdgeInsetsDirectional.only(start: 6, top: 6),
       child: Text(
         message,
         style: const TextStyle(
@@ -200,7 +201,9 @@ class DateTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    date == null ? 'Not set' : fmtDate(date),
+                    date == null
+                        ? context.l10n.notSet
+                        : fmtDate(context.l10n, date),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(

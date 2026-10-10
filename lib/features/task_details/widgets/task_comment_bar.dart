@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/colors.dart';
+import '../../../l10n/app_strings.dart';
 
 /// Tapping the field (or the send button) opens the comment composer sheet.
 class CommentBar extends StatelessWidget {
@@ -17,7 +18,7 @@ class CommentBar extends StatelessWidget {
         onTap: busy ? null : onTap,
         behavior: HitTestBehavior.opaque,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(20, 6, 6, 6),
+          padding: const EdgeInsetsDirectional.fromSTEB(20, 6, 6, 6),
           decoration: BoxDecoration(
             color: context.palette.surface,
             borderRadius: BorderRadius.circular(28),
@@ -27,7 +28,7 @@ class CommentBar extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Write a comment...',
+                  context.l10n.writeComment,
                   style: TextStyle(
                     fontSize: 14.5,
                     color: context.palette.hint,

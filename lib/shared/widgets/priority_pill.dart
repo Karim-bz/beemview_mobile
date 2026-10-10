@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_strings.dart';
+
 class PriorityPill extends StatelessWidget {
   const PriorityPill({
     super.key,
@@ -28,8 +30,7 @@ class PriorityPill extends StatelessWidget {
     }
   }
 
-  static String labelFor(String p) =>
-      p.isEmpty ? '—' : p[0].toUpperCase() + p.substring(1).toLowerCase();
+  static String labelFor(AppStrings s, String p) => s.priorityLabel(p);
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,7 @@ class PriorityPill extends StatelessWidget {
         Icon(Icons.outlined_flag_rounded, size: filled ? 15 : 14, color: color),
         const SizedBox(width: 4),
         Text(
-          labelFor(priority),
+          labelFor(context.l10n, priority),
           style: TextStyle(
             fontSize: filled ? 12.5 : 11.5,
             fontWeight: FontWeight.w700,

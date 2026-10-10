@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/colors.dart';
+import '../../../l10n/app_strings.dart';
 
 class AssignButton extends StatelessWidget {
   const AssignButton({super.key, required this.onTap});
@@ -12,7 +13,7 @@ class AssignButton extends StatelessWidget {
       onTap: onTap,
       child: CustomPaint(
         painter: _DashedPillPainter(color: AppColors.teal),
-        child: const Padding(
+        child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -20,7 +21,7 @@ class AssignButton extends StatelessWidget {
               Icon(Icons.add_rounded, size: 16, color: AppColors.teal),
               SizedBox(width: 4),
               Text(
-                'Assign',
+                context.l10n.assign,
                 style: TextStyle(
                   fontSize: 12.5,
                   fontWeight: FontWeight.w700,

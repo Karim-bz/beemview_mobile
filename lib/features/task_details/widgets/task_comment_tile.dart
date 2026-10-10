@@ -5,6 +5,7 @@ import '../../../core/format.dart';
 import '../../../data/models/comment.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/initials_avatar.dart';
+import '../../../l10n/app_strings.dart';
 
 class CommentTile extends StatelessWidget {
   const CommentTile({super.key, required this.comment});
@@ -29,7 +30,7 @@ class CommentTile extends StatelessWidget {
                     Expanded(
                       child: Text(
                         comment.authorName.isEmpty
-                            ? 'Unknown'
+                            ? context.l10n.unknown
                             : comment.authorName,
                         style: const TextStyle(
                           fontSize: 12.5,
@@ -39,7 +40,7 @@ class CommentTile extends StatelessWidget {
                     ),
                     if (comment.createdAt != null)
                       Text(
-                        relTime(comment.createdAt!),
+                        relTime(context.l10n, comment.createdAt!),
                         style: TextStyle(
                           fontSize: 11,
                           color: context.palette.muted,

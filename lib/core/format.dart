@@ -1,24 +1,10 @@
-const _months = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
+import '../l10n/app_strings.dart';
 
 /// "Oct 7, 2026" or "—".
-String fmtDate(DateTime? d) =>
-    d == null ? '—' : '${_months[d.month - 1]} ${d.day}, ${d.year}';
+String fmtDate(AppStrings s, DateTime? d) => d == null ? '—' : s.dateLong(d);
 
 /// "Oct 7".
-String fmtShort(DateTime d) => '${_months[d.month - 1]} ${d.day}';
+String fmtShort(AppStrings s, DateTime d) => s.dateShort(d);
 
 DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -31,21 +17,7 @@ int? daysUntil(DateTime? d) {
 bool isClosedStatus(String? s) => s == 'done' || s == 'canceled';
 
 /// "44m ago", "2h ago", "3d ago", "Oct 7".
-String relTime(DateTime dt) {
-  final diff = DateTime.now().difference(dt);
-  if (diff.inMinutes < 1) return 'just now';
-  if (diff.inHours < 1) return '${diff.inMinutes}m ago';
-  if (diff.inDays < 1) return '${diff.inHours}h ago';
-  if (diff.inDays < 7) return '${diff.inDays}d ago';
-  return fmtShort(dt);
-}
-
-String greeting() {
-  final h = DateTime.now().hour;
-  if (h < 12) return 'Good morning';
-  if (h < 18) return 'Good afternoon';
-  return 'Good evening';
-}
+String relTime(AppStrings s, DateTime dt) => s.relTime(dt);
 
 String firstName(String full) {
   final t = full.trim();
